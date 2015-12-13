@@ -8,7 +8,6 @@
 package com.parrot.freeflight.ui;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.opengl.GLSurfaceView;
@@ -24,13 +23,6 @@ import android.view.View.OnTouchListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.TextView;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.vision.CameraSource;
-import com.google.android.gms.vision.MultiProcessor;
-import com.google.android.gms.vision.Tracker;
-import com.google.android.gms.vision.face.Face;
-import com.google.android.gms.vision.face.FaceDetector;
 import com.parrot.freeflight.R;
 import com.parrot.freeflight.drone.NavData;
 import com.parrot.freeflight.gestures.EnhancedGestureDetector;
@@ -44,82 +36,13 @@ import com.parrot.freeflight.ui.hud.Sprite.Align;
 import com.parrot.freeflight.ui.hud.Text;
 import com.parrot.freeflight.ui.hud.ToggleButton;
 import com.parrot.freeflight.utils.FontUtils.TYPEFACE;
-import com.parrot.freeflight.video.GraphicOverlay;
 import com.parrot.freeflight.video.VideoStageRenderer;
 import com.parrot.freeflight.video.VideoStageView;
-
-import java.io.IOException;
 
 public class HudViewController 
 	implements OnTouchListener,
 			   OnGestureListener
 {
-	//==============================================================================================
-	// Graphic Face Tracker
-	//==============================================================================================
-
-	/**
-	 * Factory for creating a face tracker to be associated with a new face.  The multiprocessor
-	 * uses this factory to create face trackers as needed -- one for each individual.
-	 */
-	private class GraphicFaceTrackerFactory implements MultiProcessor.Factory<Face> {
-		@Override
-		public Tracker<Face> create(Face face) {
-			return new GraphicFaceTracker(mGraphicOverlay);
-		}
-	}
-
-	/**
-	 * Face tracker for each detected individual. This maintains a face graphic within the app's
-	 * associated face overlay.
-	 */
-	private class GraphicFaceTracker extends Tracker<Face> {
-		private GraphicOverlay mOverlay;
-		private FaceGraphic mFaceGraphic;
-
-		GraphicFaceTracker(GraphicOverlay overlay) {
-			mOverlay = overlay;
-			mFaceGraphic = new FaceGraphic(overlay);
-		}
-
-		/**
-		 * Start tracking the detected face instance within the face overlay.
-		 */
-		@Override
-		public void onNewItem(int faceId, Face item) {
-			mFaceGraphic.setId(faceId);
-		}
-
-		/**
-		 * Update the position/characteristics of the face within the overlay.
-		 */
-		@Override
-		public void onUpdate(FaceDetector.Detections<Face> detectionResults, Face face) {
-			mOverlay.add(mFaceGraphic);
-			mFaceGraphic.updateFace(face);
-		}
-
-		/**
-		 * Hide the graphic when the corresponding face was not detected.  This can happen for
-		 * intermediate frames temporarily (e.g., if the face was momentarily blocked from
-		 * view).
-		 */
-		@Override
-		public void onMissing(FaceDetector.Detections<Face> detectionResults) {
-			mOverlay.remove(mFaceGraphic);
-		}
-
-		/**
-		 * Called when the face is assumed to be gone for good. Remove the graphic annotation from
-		 * the overlay.
-		 */
-		@Override
-		public void onDone() {
-			mOverlay.remove(mFaceGraphic);
-		}
-	}
-
-	//Finish here
 	public enum JoystickType {
 		NONE,
 		ANALOGUE,
@@ -212,17 +135,7 @@ public class HudViewController
 //			RelativeLayout root = (RelativeLayout) context.findViewById(R.id.controllerRootLayout);
 //			root.removeView(glView);
 			glView = null;
-
-			if(true)
-			{
-				FaceDetector detector = new FaceDetector.Builder(context)
-						.setClassificationType(FaceDetector.ALL_CLASSIFICATIONS)
-						.build();
-
-				detector.setProcessor(
-						new MultiProcessor.Builder<>(new GraphicFaceTrackerFactory())
-								.build());
-			}
+			
 			canvasView = new VideoStageView(context);
 			canvasView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 //			root.addView(canvasView, 0);
@@ -702,25 +615,10 @@ public class HudViewController
 		
 		if (canvasView != null) {
 			canvasView.onStart();
-			startCameraSource();
 		}
 	}
-	private CameraSource mCameraSource = null;
 
 
-	private GraphicOverlay mGraphicOverlay;
-	private void startCameraSource() {
-
-		if (mCameraSource != null) {
-			try {
-				canvasView.start(mCameraSource, mGraphicOverlay);
-			} catch (IOException e) {
-				Log.e(TAG, "Unable to start camera source.", e);
-				mCameraSource.release();
-				mCameraSource = null;
-			}
-		}
-	}
 	public boolean onTouch(View v, MotionEvent event)
 	{
 		boolean result = false;

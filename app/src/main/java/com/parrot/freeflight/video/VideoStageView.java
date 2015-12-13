@@ -7,11 +7,6 @@ import android.graphics.Paint;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-import com.google.android.gms.common.images.Size;
-import com.google.android.gms.vision.CameraSource;
-
-import java.io.IOException;
-
 public class VideoStageView extends SurfaceView 
 implements 
 	SurfaceHolder.Callback
@@ -32,7 +27,7 @@ implements
 	private int width = 0;
 	private int height = 0;
 	private DrawThread invalidateThread;
-
+	
 	Paint fpsPaint = new Paint();
 	
 	public VideoStageView(Context context) {
@@ -52,8 +47,7 @@ implements
 		}
 		else 
 			super.onDraw(canvas);
-
-
+		
 		if (SHOW_FPS) {
 	        now=System.currentTimeMillis();
 	        canvas.drawText(framesCountAvg + " fps", 80, 70, fpsPaint);
@@ -174,7 +168,7 @@ implements
 
                 	synchronized (surfaceHolder) {	
                 		view.onDraw(c);
-                	}
+                	}                 
             	} finally {
                     if (c != null) {
                         surfaceHolder.unlockCanvasAndPost(c);
@@ -184,56 +178,4 @@ implements
         }
     }
 
-	//start
-	private CameraSource mCameraSource;
-	private GraphicOverlay mOverlay;
-	public void start(CameraSource cameraSource) throws IOException {
-		if (cameraSource == null) {
-			stop();
-		}
-
-		mCameraSource = cameraSource;
-
-		if (mCameraSource != null) {
-			//mStartRequested = true;
-			startIfReady();
-		}
-	}
-	public void start(CameraSource cameraSource, GraphicOverlay overlay) throws IOException {
-	mOverlay = overlay;
-	start(cameraSource);
-}
-
-	public void stop() {
-		if (mCameraSource != null) {
-			mCameraSource.stop();
-		}
-	}
-
-	public void release() {
-		if (mCameraSource != null) {
-			mCameraSource.release();
-			mCameraSource = null;
-		}
-	}
-
-	private void startIfReady() throws IOException {
-		if (true) {
-			mCameraSource.start(this.getHolder());
-			if (mOverlay != null) {
-				Size size = mCameraSource.getPreviewSize();
-				int min = Math.min(size.getWidth(), size.getHeight());
-				int max = Math.max(size.getWidth(), size.getHeight());
-				if (true) {
-					// Swap width and height sizes when in portrait, since it will be rotated by
-					// 90 degrees
-					mOverlay.setCameraInfo(min, max, mCameraSource.getCameraFacing());
-				} else {
-					mOverlay.setCameraInfo(max, min, mCameraSource.getCameraFacing());
-				}
-				mOverlay.clear();
-			}
-			//mStartRequested = false;
-		}
-	}
 }
