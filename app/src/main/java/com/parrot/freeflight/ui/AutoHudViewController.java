@@ -39,7 +39,7 @@ import com.parrot.freeflight.utils.FontUtils.TYPEFACE;
 import com.parrot.freeflight.video.VideoStageRenderer;
 import com.parrot.freeflight.video.VideoStageView;
 
-public class HudViewController 
+public class AutoHudViewController
 	implements OnTouchListener,
 			   OnGestureListener
 {
@@ -72,9 +72,9 @@ public class HudViewController
 	private static final int USB_INDICATOR_TEXT_ID = 17;
 	private static final int BACK_BTN_ID = 18;
 	private static final int LAND_ID = 19;
-	
+
 	private Image bottomBarBg;
-	
+
 	private Button btnSettings;
 	private Button btnTakeOff;
 	private Button btnLand;
@@ -83,36 +83,36 @@ public class HudViewController
 	private Button btnPhoto;
 	private Button btnBack;
 	private ToggleButton btnRecord;
-	
+
 	private Button[] buttons;
-	
+
 	private Indicator batteryIndicator;
 	private Indicator wifiIndicator;
 	private Image  usbIndicator;
 //	private TextView txtVideoFps;
 	private TextView txtSceneFps;
-	
+
 	private Text txtBatteryStatus;
 	private Text txtAlert;
 	private Text txtRecord;
 	private Text txtUsbRemaining;
-	
+
 	private GLSurfaceView glView;
 	private VideoStageView canvasView;
-	
-	private JoystickBase[] joysticks;
+
+	//private JoystickBase[] joysticks;
 	private float joypadOpacity;
 	private GestureDetector gestureDetector;
-	
+
 	private VideoStageRenderer renderer;
 	private Activity context;
-	
+
 	private boolean useSoftwareRendering;
 	private int prevRemainingTime;
 
 	private SparseIntArray emergencyStringMap;
 
-	public HudViewController(Activity context, boolean useSoftwareRendering)
+	public AutoHudViewController(Activity context, boolean useSoftwareRendering)
 	{
 	    joypadOpacity = 1f;
 		this.context = context;
@@ -120,7 +120,7 @@ public class HudViewController
 		gestureDetector = new EnhancedGestureDetector(context, this);
 		
 		canvasView = null;
-		joysticks = new JoystickBase[2];
+		//joysticks = new JoystickBase[2];
 
 		
 		glView = new GLSurfaceView(context);
@@ -232,9 +232,9 @@ public class HudViewController
 		
 		
 		txtAlert = new Text(context, "", Align.TOP_CENTER);
-		txtAlert.setMargin((int)res.getDimension(R.dimen.hud_alert_text_margin_top), 0, 0, 0);
+		txtAlert.setMargin((int) res.getDimension(R.dimen.hud_alert_text_margin_top), 0, 0, 0);
         txtAlert.setTextColor(Color.RED);
-        txtAlert.setTextSize((int)res.getDimension(R.dimen.hud_alert_text_size));
+        txtAlert.setTextSize((int) res.getDimension(R.dimen.hud_alert_text_size));
         txtAlert.setBold(true);
         txtAlert.blink(true);
 
@@ -298,59 +298,59 @@ public class HudViewController
 	}
 	
 	
-	public void setJoysticks(JoystickBase left, JoystickBase right)
-	{
-		joysticks[0] = left;
-		if (left != null)   {
-		    joysticks[0].setAlign(Align.BOTTOM_LEFT);
-		    joysticks[0].setAlpha(joypadOpacity);
-		}
-		joysticks[1] = right;
-		if (right != null)	{
-		    joysticks[1].setAlign(Align.BOTTOM_RIGHT);
-		    joysticks[1].setAlpha(joypadOpacity);
-		}
+//	public void setJoysticks(JoystickBase left, JoystickBase right)
+//	{
+//		joysticks[0] = left;
+//		if (left != null)   {
+//		    joysticks[0].setAlign(Align.BOTTOM_LEFT);
+//		    joysticks[0].setAlpha(joypadOpacity);
+//		}
+//		joysticks[1] = right;
+//		if (right != null)	{
+//		    joysticks[1].setAlign(Align.BOTTOM_RIGHT);
+//		    joysticks[1].setAlpha(joypadOpacity);
+//		}
+//
+//		for (int i=0; i<joysticks.length; ++i) {
+//		    JoystickBase joystick = joysticks[i];
+//
+//			if (joystick != null) {
+//				if (!useSoftwareRendering) {
+//					joystick.setInverseYWhenDraw(true);
+//				} else {
+//					joystick.setInverseYWhenDraw(false);
+//				}
+//
+//				int margin = context.getResources().getDimensionPixelSize(R.dimen.hud_joy_margin);
+//
+//				joystick.setMargin(0, margin, bottomBarBg.getHeight() + margin, margin);
+//			}
+//		}
+//
+//		renderer.removeSprite(JOY_ID_LEFT);
+//		renderer.removeSprite(JOY_ID_RIGHT);
+//
+//		if (left != null) {
+//			renderer.addSprite(JOY_ID_LEFT, left);
+//		}
+//
+//		if (right != null) {
+//			renderer.addSprite(JOY_ID_RIGHT, right);
+//		}
+//	}
 	
-		for (int i=0; i<joysticks.length; ++i) {
-		    JoystickBase joystick = joysticks[i];
-		    
-			if (joystick != null) {
-				if (!useSoftwareRendering) {
-					joystick.setInverseYWhenDraw(true);
-				} else {
-					joystick.setInverseYWhenDraw(false);
-				}
-				
-				int margin = context.getResources().getDimensionPixelSize(R.dimen.hud_joy_margin);
-				
-				joystick.setMargin(0, margin, bottomBarBg.getHeight() + margin, margin);
-			}
-		}
-		
-		renderer.removeSprite(JOY_ID_LEFT);
-		renderer.removeSprite(JOY_ID_RIGHT);
-
-		if (left != null) {
-			renderer.addSprite(JOY_ID_LEFT, left);
-		}
-		
-		if (right != null) {
-			renderer.addSprite(JOY_ID_RIGHT, right);
-		}
-	}
-	
-	
-	public JoystickBase getJoystickLeft()
-	{
-	    return joysticks[0];
-	}
-	
-	
-	public JoystickBase getJoystickRight()
-	{
-	    return joysticks[1];
-	}
-	
+//
+//	public JoystickBase getJoystickLeft()
+//	{
+//	    return joysticks[0];
+//	}
+//
+//
+//	public JoystickBase getJoystickRight()
+//	{
+//	    return joysticks[1];
+//	}
+//
 
 	public void setInterfaceOpacity(float opacity)
 	{
@@ -361,11 +361,11 @@ public class HudViewController
 		
 		joypadOpacity = opacity / 100f;
 		
-		Sprite joystick = renderer.getSprite(JOY_ID_LEFT);
-		joystick.setAlpha(joypadOpacity);
-		
-		joystick = renderer.getSprite(JOY_ID_RIGHT);
-		joystick.setAlpha(joypadOpacity);
+//		Sprite joystick = renderer.getSprite(JOY_ID_LEFT);
+//		joystick.setAlpha(joypadOpacity);
+//
+//		joystick = renderer.getSprite(JOY_ID_RIGHT);
+//		joystick.setAlpha(joypadOpacity);
 	}
 	
 	
@@ -635,15 +635,15 @@ public class HudViewController
 		if (result != true) {	
 			gestureDetector.onTouchEvent(event);
 			
-			for (int i=0; i<joysticks.length; ++i) {
-				JoystickBase joy = joysticks[i];
-				if (joy != null) {
-					if (joy.processTouch(v, event)) {
-						
-						result = true;
-					}
-				}
-			}
+//			for (int i=0; i<joysticks.length; ++i) {
+//				JoystickBase joy = joysticks[i];
+//				if (joy != null) {
+//					if (joy.processTouch(v, event)) {
+//
+//						result = true;
+//					}
+//				}
+//			}
 		}
 		
 			

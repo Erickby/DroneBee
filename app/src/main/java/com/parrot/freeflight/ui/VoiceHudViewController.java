@@ -30,8 +30,6 @@ import com.parrot.freeflight.ui.hud.Button;
 import com.parrot.freeflight.ui.hud.Image;
 import com.parrot.freeflight.ui.hud.Image.SizeParams;
 import com.parrot.freeflight.ui.hud.Indicator;
-import com.parrot.freeflight.ui.hud.JoystickBase;
-import com.parrot.freeflight.ui.hud.Sprite;
 import com.parrot.freeflight.ui.hud.Sprite.Align;
 import com.parrot.freeflight.ui.hud.Text;
 import com.parrot.freeflight.ui.hud.ToggleButton;
@@ -39,7 +37,7 @@ import com.parrot.freeflight.utils.FontUtils.TYPEFACE;
 import com.parrot.freeflight.video.VideoStageRenderer;
 import com.parrot.freeflight.video.VideoStageView;
 
-public class HudViewController 
+public class VoiceHudViewController
 	implements OnTouchListener,
 			   OnGestureListener
 {
@@ -72,9 +70,10 @@ public class HudViewController
 	private static final int USB_INDICATOR_TEXT_ID = 17;
 	private static final int BACK_BTN_ID = 18;
 	private static final int LAND_ID = 19;
-	
+	private static final int VOICE_ID = 20;
+
 	private Image bottomBarBg;
-	
+
 	private Button btnSettings;
 	private Button btnTakeOff;
 	private Button btnLand;
@@ -82,37 +81,38 @@ public class HudViewController
 	private Button btnCameraSwitch;
 	private Button btnPhoto;
 	private Button btnBack;
+	private Button btnVoice;
 	private ToggleButton btnRecord;
-	
+
 	private Button[] buttons;
-	
+
 	private Indicator batteryIndicator;
 	private Indicator wifiIndicator;
 	private Image  usbIndicator;
 //	private TextView txtVideoFps;
 	private TextView txtSceneFps;
-	
+
 	private Text txtBatteryStatus;
 	private Text txtAlert;
 	private Text txtRecord;
 	private Text txtUsbRemaining;
-	
+
 	private GLSurfaceView glView;
 	private VideoStageView canvasView;
-	
-	private JoystickBase[] joysticks;
+
+	//private JoystickBase[] joysticks;
 	private float joypadOpacity;
 	private GestureDetector gestureDetector;
-	
+
 	private VideoStageRenderer renderer;
 	private Activity context;
-	
+
 	private boolean useSoftwareRendering;
 	private int prevRemainingTime;
 
 	private SparseIntArray emergencyStringMap;
 
-	public HudViewController(Activity context, boolean useSoftwareRendering)
+	public VoiceHudViewController(Activity context, boolean useSoftwareRendering)
 	{
 	    joypadOpacity = 1f;
 		this.context = context;
@@ -120,7 +120,7 @@ public class HudViewController
 		gestureDetector = new EnhancedGestureDetector(context, this);
 		
 		canvasView = null;
-		joysticks = new JoystickBase[2];
+		//joysticks = new JoystickBase[2];
 
 		
 		glView = new GLSurfaceView(context);
@@ -158,7 +158,9 @@ public class HudViewController
 		btnTakeOff = new Button(res, R.drawable.btn_take_off_normal, R.drawable.btn_take_off_pressed, Align.BOTTOM_RIGHT);
 		btnLand = new Button(res, R.drawable.btn_landing, R.drawable.btn_landing_pressed, Align.BOTTOM_RIGHT);
 		btnLand.setVisible(false);
-		
+
+		btnVoice = new Button(res, R.drawable.btn_voice,R.drawable.btn_voice_pressed,Align.BOTTOM_CENTER);
+
 		Image topBarBg = new Image(res, R.drawable.barre_haut, Align.TOP_CENTER);
 		topBarBg.setSizeParams(SizeParams.FILL_SCREEN, SizeParams.NONE);
 		topBarBg.setAlphaEnabled(false);
@@ -220,7 +222,7 @@ public class HudViewController
 //		wifiIndicator = new Indicator(res, wifiIndicatorRes, Align.TOP_LEFT);
 //		wifiIndicator.setMargin(0, 0, 0, (int)res.getDimension(R.dimen.hud_wifi_indicator_margin_left));
 		
-		buttons = new Button[8];
+		buttons = new Button[9];
 		buttons[0] = btnSettings;
 		buttons[1] = btnEmergency;
 		buttons[2] = btnTakeOff;
@@ -229,12 +231,13 @@ public class HudViewController
 		buttons[5] = btnRecord;
 		buttons[6] = btnCameraSwitch;
 		buttons[7] = btnBack;
+		buttons[8] = btnVoice;
 		
 		
 		txtAlert = new Text(context, "", Align.TOP_CENTER);
-		txtAlert.setMargin((int)res.getDimension(R.dimen.hud_alert_text_margin_top), 0, 0, 0);
+		txtAlert.setMargin((int) res.getDimension(R.dimen.hud_alert_text_margin_top), 0, 0, 0);
         txtAlert.setTextColor(Color.RED);
-        txtAlert.setTextSize((int)res.getDimension(R.dimen.hud_alert_text_size));
+        txtAlert.setTextSize((int) res.getDimension(R.dimen.hud_alert_text_size));
         txtAlert.setBold(true);
         txtAlert.blink(true);
 
@@ -255,6 +258,7 @@ public class HudViewController
 //		renderer.addSprite(RECORD_LABEL_ID, txtRecord);
 //		renderer.addSprite(USB_INDICATOR_ID, usbIndicator);
 //		renderer.addSprite(USB_INDICATOR_TEXT_ID, txtUsbRemaining);
+		renderer.addSprite(VOICE_ID,btnVoice);
 	}
 	
 	
@@ -298,59 +302,59 @@ public class HudViewController
 	}
 	
 	
-	public void setJoysticks(JoystickBase left, JoystickBase right)
-	{
-		joysticks[0] = left;
-		if (left != null)   {
-		    joysticks[0].setAlign(Align.BOTTOM_LEFT);
-		    joysticks[0].setAlpha(joypadOpacity);
-		}
-		joysticks[1] = right;
-		if (right != null)	{
-		    joysticks[1].setAlign(Align.BOTTOM_RIGHT);
-		    joysticks[1].setAlpha(joypadOpacity);
-		}
+//	public void setJoysticks(JoystickBase left, JoystickBase right)
+//	{
+//		joysticks[0] = left;
+//		if (left != null)   {
+//		    joysticks[0].setAlign(Align.BOTTOM_LEFT);
+//		    joysticks[0].setAlpha(joypadOpacity);
+//		}
+//		joysticks[1] = right;
+//		if (right != null)	{
+//		    joysticks[1].setAlign(Align.BOTTOM_RIGHT);
+//		    joysticks[1].setAlpha(joypadOpacity);
+//		}
+//
+//		for (int i=0; i<joysticks.length; ++i) {
+//		    JoystickBase joystick = joysticks[i];
+//
+//			if (joystick != null) {
+//				if (!useSoftwareRendering) {
+//					joystick.setInverseYWhenDraw(true);
+//				} else {
+//					joystick.setInverseYWhenDraw(false);
+//				}
+//
+//				int margin = context.getResources().getDimensionPixelSize(R.dimen.hud_joy_margin);
+//
+//				joystick.setMargin(0, margin, bottomBarBg.getHeight() + margin, margin);
+//			}
+//		}
+//
+//		renderer.removeSprite(JOY_ID_LEFT);
+//		renderer.removeSprite(JOY_ID_RIGHT);
+//
+//		if (left != null) {
+//			renderer.addSprite(JOY_ID_LEFT, left);
+//		}
+//
+//		if (right != null) {
+//			renderer.addSprite(JOY_ID_RIGHT, right);
+//		}
+//	}
 	
-		for (int i=0; i<joysticks.length; ++i) {
-		    JoystickBase joystick = joysticks[i];
-		    
-			if (joystick != null) {
-				if (!useSoftwareRendering) {
-					joystick.setInverseYWhenDraw(true);
-				} else {
-					joystick.setInverseYWhenDraw(false);
-				}
-				
-				int margin = context.getResources().getDimensionPixelSize(R.dimen.hud_joy_margin);
-				
-				joystick.setMargin(0, margin, bottomBarBg.getHeight() + margin, margin);
-			}
-		}
-		
-		renderer.removeSprite(JOY_ID_LEFT);
-		renderer.removeSprite(JOY_ID_RIGHT);
-
-		if (left != null) {
-			renderer.addSprite(JOY_ID_LEFT, left);
-		}
-		
-		if (right != null) {
-			renderer.addSprite(JOY_ID_RIGHT, right);
-		}
-	}
-	
-	
-	public JoystickBase getJoystickLeft()
-	{
-	    return joysticks[0];
-	}
-	
-	
-	public JoystickBase getJoystickRight()
-	{
-	    return joysticks[1];
-	}
-	
+//
+//	public JoystickBase getJoystickLeft()
+//	{
+//	    return joysticks[0];
+//	}
+//
+//
+//	public JoystickBase getJoystickRight()
+//	{
+//	    return joysticks[1];
+//	}
+//
 
 	public void setInterfaceOpacity(float opacity)
 	{
@@ -361,11 +365,11 @@ public class HudViewController
 		
 		joypadOpacity = opacity / 100f;
 		
-		Sprite joystick = renderer.getSprite(JOY_ID_LEFT);
-		joystick.setAlpha(joypadOpacity);
-		
-		joystick = renderer.getSprite(JOY_ID_RIGHT);
-		joystick.setAlpha(joypadOpacity);
+//		Sprite joystick = renderer.getSprite(JOY_ID_LEFT);
+//		joystick.setAlpha(joypadOpacity);
+//
+//		joystick = renderer.getSprite(JOY_ID_RIGHT);
+//		joystick.setAlpha(joypadOpacity);
 	}
 	
 	
@@ -587,7 +591,11 @@ public class HudViewController
 	{
 		this.btnCameraSwitch.setOnClickListener(listener);
 	}
-	
+
+	public void setVoiceButtonCLickListener(OnClickListener listener)
+	{
+		this.btnVoice.setOnClickListener(listener);
+	}
 	
 	public void setDoubleTapClickListener(OnDoubleTapListener listener) 
 	{
@@ -635,15 +643,15 @@ public class HudViewController
 		if (result != true) {	
 			gestureDetector.onTouchEvent(event);
 			
-			for (int i=0; i<joysticks.length; ++i) {
-				JoystickBase joy = joysticks[i];
-				if (joy != null) {
-					if (joy.processTouch(v, event)) {
-						
-						result = true;
-					}
-				}
-			}
+//			for (int i=0; i<joysticks.length; ++i) {
+//				JoystickBase joy = joysticks[i];
+//				if (joy != null) {
+//					if (joy.processTouch(v, event)) {
+//
+//						result = true;
+//					}
+//				}
+//			}
 		}
 		
 			

@@ -63,7 +63,7 @@ implements
 	private CheckMediaAvailabilityTask checkMediaTask;
     private CheckFirmwareTask checkFirmwareTask;
     private CheckDroneNetworkAvailabilityTask checkDroneConnectionTask;
-    
+
 	private boolean droneOnNetwork;
 	private boolean firmwareUpdateAvailable;
 	private EPhotoVideoState mediaState;
@@ -187,8 +187,29 @@ implements
 
         return true;
     }
-    
-    
+
+    @Override
+    protected boolean onStartVoiceControl() {
+        if(!droneOnNetwork)
+        {
+            return false;
+        }
+        Intent voiceActivity = new Intent(this, VoiceConnectActivity.class);
+        startActivity(voiceActivity);
+        return true;
+    }
+
+    @Override
+    protected boolean onStartAutoControl() {
+        if(!droneOnNetwork)
+        {
+            return false;
+        }
+        Intent autoActivity = new Intent(this, AutoConnectActivity.class);
+        startActivity(autoActivity);
+        return true;
+    }
+
     @Override
     protected boolean onStartFirmwareUpdate() 
     {

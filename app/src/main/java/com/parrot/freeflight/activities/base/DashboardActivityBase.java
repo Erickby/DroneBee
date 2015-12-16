@@ -41,6 +41,9 @@ MediaStorageReceiverDelegate
 	private CheckedTextView btnFirmwareUpdate;
 	private CheckedTextView btnParrotGames;
 	private CheckedTextView btnGetYourDrone;
+    //    my custom btn
+    private CheckedTextView btnVoiceControl;
+    private CheckedTextView btnAutoControl;
 
     private AlertDialog alertDialog;
 
@@ -72,22 +75,29 @@ MediaStorageReceiverDelegate
     private void initUI() 
 	{
 		btnFreeFlight     = (CheckedTextView) findViewById(R.id.btnFreeFlight);
-		btnAcademy        = (CheckedTextView) findViewById(R.id.btnAcademy);
+//		btnAcademy        = (CheckedTextView) findViewById(R.id.btnAcademy);
 		btnPhotosVideos   = (CheckedTextView) findViewById(R.id.btnPhotosVideos);
-		btnFirmwareUpdate = (CheckedTextView) findViewById(R.id.btnFirmwareUpdate);
-		btnParrotGames    = (CheckedTextView) findViewById(R.id.btnGames);
-		btnGetYourDrone   = (CheckedTextView) findViewById(R.id.btnGetYourDrone);
+//		btnFirmwareUpdate = (CheckedTextView) findViewById(R.id.btnFirmwareUpdate);
+//		btnParrotGames    = (CheckedTextView) findViewById(R.id.btnGames);
+//		btnGetYourDrone   = (CheckedTextView) findViewById(R.id.btnGetYourDrone);
+
+        btnVoiceControl = (CheckedTextView) findViewById(R.id.btnVoiceControl);
+        btnAutoControl = (CheckedTextView) findViewById(R.id.btnAutoControl);
+
 	}
 
 
 	private void initListeners()
 	{
 		btnFreeFlight.setOnClickListener(this);
-		btnAcademy.setOnClickListener(this);
+		//btnAcademy.setOnClickListener(this);
 		btnPhotosVideos.setOnClickListener(this);
-		btnFirmwareUpdate.setOnClickListener(this);
-		btnParrotGames.setOnClickListener(this);
-		btnGetYourDrone.setOnClickListener(this);
+		//btnFirmwareUpdate.setOnClickListener(this);
+		//btnParrotGames.setOnClickListener(this);
+		//btnGetYourDrone.setOnClickListener(this);
+
+        btnVoiceControl.setOnClickListener(this);
+        btnAutoControl.setOnClickListener(this);
 	}
 
 	
@@ -129,11 +139,13 @@ MediaStorageReceiverDelegate
 			throw new IllegalStateException("Should be called from UI thread");
 
 		btnFreeFlight.setChecked(isFreeFlightEnabled());
-		btnAcademy.setChecked(isAcademyEnabled());
+		//btnAcademy.setChecked(isAcademyEnabled());
 		btnPhotosVideos.setChecked(getPhotoVideoState().equals(EPhotoVideoState.READY));
-		btnFirmwareUpdate.setChecked(isFirmwareUpdateEnabled());
-		btnParrotGames.setChecked(isParrotGamesEnabled());
-		btnGetYourDrone.setChecked(isGuestSpaceEnabled());
+		//btnFirmwareUpdate.setChecked(isFirmwareUpdateEnabled());
+		//btnParrotGames.setChecked(isParrotGamesEnabled());
+		//btnGetYourDrone.setChecked(isGuestSpaceEnabled());
+        btnVoiceControl.setChecked(isFreeFlightEnabled());
+        btnAutoControl.setChecked(isFreeFlightEnabled());
 	}
 
 	
@@ -149,13 +161,13 @@ MediaStorageReceiverDelegate
 				}
 
 				break;
-			case R.id.btnAcademy:
-				// Open academy
-				if (!isAcademyEnabled() || !onStartAcademy())
-				{
-					showErrorMessageForTime(v, getString(R.string.internet_connection_not_available), 2000);
-				}
-				break;
+//			case R.id.btnAcademy:
+//				// Open academy
+//				if (!isAcademyEnabled() || !onStartAcademy())
+//				{
+//					showErrorMessageForTime(v, getString(R.string.internet_connection_not_available), 2000);
+//				}
+//				break;
 			case R.id.btnPhotosVideos:
 				// Open photos/videos
 			    EPhotoVideoState state = getPhotoVideoState();
@@ -174,27 +186,45 @@ MediaStorageReceiverDelegate
 			        break;
 			    }
 				break;
-			case R.id.btnFirmwareUpdate:
-				// Open drone update
-				if (!isFirmwareUpdateEnabled() || !onStartFirmwareUpdate())
-				{
-					showErrorMessageForTime(v, getString(R.string.your_ar_drone_is_up_to_date), 2000);
-				}
-				break;
-			case R.id.btnGames:
-				// Open Parrot Games
-				if (!isParrotGamesEnabled() || !onStartGames())
-				{
-					showErrorMessageForTime(v, getString(R.string.we_have_no_games_yet), 2000);
-				}
-				break;
-			case R.id.btnGetYourDrone:
-				// Open get your drone
-				if (!isGuestSpaceEnabled() || !onStartGuestSpace())
-				{
-					showErrorMessageForTime(v, getString(R.string.not_implemented_yet), 2000);
-				}
-				break;
+
+            case R.id.btnVoiceControl:
+                // Open voiceControl
+                if (!isFreeFlightEnabled() || !onStartVoiceControl())
+                {
+                    showErrorMessageForTime(v, getString(R.string.wifi_not_available_please_connect_device_to_drone), 2000);
+                }
+
+                break;
+
+            case R.id.btnAutoControl:
+                // Open autoControl
+                if (!isFreeFlightEnabled() || !onStartAutoControl())
+                {
+                    showErrorMessageForTime(v, getString(R.string.wifi_not_available_please_connect_device_to_drone), 2000);
+                }
+
+                break;
+//			case R.id.btnFirmwareUpdate:
+//				// Open drone update
+//				if (!isFirmwareUpdateEnabled() || !onStartFirmwareUpdate())
+//				{
+//					showErrorMessageForTime(v, getString(R.string.your_ar_drone_is_up_to_date), 2000);
+//				}
+//				break;
+//			case R.id.btnGames:
+//				// Open Parrot Games
+//				if (!isParrotGamesEnabled() || !onStartGames())
+//				{
+//					showErrorMessageForTime(v, getString(R.string.we_have_no_games_yet), 2000);
+//				}
+//				break;
+//			case R.id.btnGetYourDrone:
+//				// Open get your drone
+//				if (!isGuestSpaceEnabled() || !onStartGuestSpace())
+//				{
+//					showErrorMessageForTime(v, getString(R.string.not_implemented_yet), 2000);
+//				}
+//				break;
 		}
 	}
 
@@ -245,6 +275,16 @@ MediaStorageReceiverDelegate
 	{
 		return false;
 	}
+
+    protected boolean onStartVoiceControl()
+    {
+        return false;
+    }
+
+    protected boolean onStartAutoControl()
+    {
+        return false;
+    }
 
 	protected boolean onStartAcademy()
 	{

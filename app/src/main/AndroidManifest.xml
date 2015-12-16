@@ -70,7 +70,21 @@
             android:finishOnTaskLaunch="true"
             android:noHistory="true"
             android:screenOrientation="landscape" android:excludeFromRecents="true" android:stateNotNeeded="true"/>
+
         <activity
+            android:name=".activities.VoiceConnectActivity"
+            android:finishOnTaskLaunch="true"
+            android:noHistory="true"
+            android:screenOrientation="landscape" android:excludeFromRecents="true" android:stateNotNeeded="true"/>
+
+        <activity
+            android:name=".activities.AutoConnectActivity"
+            android:finishOnTaskLaunch="true"
+            android:noHistory="true"
+            android:screenOrientation="landscape" android:excludeFromRecents="true" android:stateNotNeeded="true"/>
+
+
+    <activity
             android:name=".activities.ControlDroneActivity"
             android:configChanges="touchscreen|keyboardHidden|orientation"
             android:finishOnTaskLaunch="true"
@@ -78,8 +92,25 @@
             android:launchMode="singleInstance"
             android:screenOrientation="landscape"
             android:theme="@style/FreeFlightTheme.HudScreen" />
+    <activity
+        android:name=".activities.VoiceControlDroneActivity"
+        android:configChanges="touchscreen|keyboardHidden|orientation"
+        android:finishOnTaskLaunch="true"
+        android:hardwareAccelerated="true"
+        android:launchMode="singleInstance"
+        android:screenOrientation="landscape"
+        android:theme="@style/FreeFlightTheme.HudScreen" />
+    <activity
+        android:name=".activities.AutoControlDroneActivity"
+        android:configChanges="touchscreen|keyboardHidden|orientation"
+        android:finishOnTaskLaunch="true"
+        android:hardwareAccelerated="true"
+        android:launchMode="singleInstance"
+        android:screenOrientation="landscape"
+        android:theme="@style/FreeFlightTheme.HudScreen" />
 
-        <service android:name=".service.DroneControlService" />
+
+    <service android:name=".service.DroneControlService" />
 
         <activity
             android:name=".activities.MediaActivity"

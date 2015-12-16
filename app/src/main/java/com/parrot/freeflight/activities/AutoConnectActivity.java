@@ -1,8 +1,6 @@
 
 package com.parrot.freeflight.activities;
 
-import java.util.Random;
-
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -29,7 +27,9 @@ import com.parrot.freeflight.receivers.DroneReadyReceiverDelegate;
 import com.parrot.freeflight.service.DroneControlService;
 import com.parrot.freeflight.utils.SystemUtils;
 
-public class ConnectActivity
+import java.util.Random;
+
+public class AutoConnectActivity
         extends ParrotActivity
         implements ServiceConnection, DroneReadyReceiverDelegate, DroneConnectionChangeReceiverDelegate
 {
@@ -46,7 +46,7 @@ public class ConnectActivity
             R.layout.hint_my_wait
     };
 
-    private static final String TAG = ConnectActivity.class.getSimpleName();
+    private static final String TAG = AutoConnectActivity.class.getSimpleName();
 
     private DroneControlService mService;
     private String AUTO_SKIPP_KEY = "auto_skip";
@@ -100,7 +100,7 @@ public class ConnectActivity
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
             {
-                ConnectActivity.this.setAutoSkip(isChecked);
+                AutoConnectActivity.this.setAutoSkip(isChecked);
             }
         });
     }
@@ -157,7 +157,7 @@ public class ConnectActivity
 
     private void onOpenHudScreen()
     {
-        Intent droneControlActivity = new Intent(ConnectActivity.this, ControlDroneActivity.class);
+        Intent droneControlActivity = new Intent(AutoConnectActivity.this, AutoControlDroneActivity.class);
         droneControlActivity.putExtra("USE_SOFTWARE_RENDERING", false);
         droneControlActivity.putExtra("FORCE_COMBINED_CONTROL_MODE", false);
         startActivity(droneControlActivity);

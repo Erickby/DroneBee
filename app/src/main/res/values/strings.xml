@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">AR.FreeFlight</string>
-    <string name="app_version">v2.0-SDK</string>
+    <string name="app_name">AutoFlight</string>
+    <string name="app_version">V1.0</string>
     <string name="your_changes_will_be_applied_after_rebooting_drone">Your changes will be applied after rebooting the Ar.Drone!</string>
     <string name="quit_app_reboot_drone_connect_to_network">\t- Quit application\n\t- Reboot your AR.Drone\n\t- Connect your {device} on {network} network\n\t- Launch application</string>
     <string name="START_NOT_RECEIVED">START NOT RECEIVED</string>
@@ -141,9 +141,7 @@
     <string name="browser_error">Error: Could not connect to the server</string>
     <string name="browser_done">Done</string>
     <string name="ARDRONE_ACADEMY">AR.DRONE\nACADEMY</string>
-    <string name="PHOTOS_VIDEOS">PHOTOS\nVIDEOS</string>
     <string name="ARDRONE_UPDATE">AR.DRONE\nUPDATE</string>
-    <string name="PILOTING">PILOTING</string>
     <string name="GAMES">GAMES</string>
     <string name="DEMO">DEMO</string>
     <string name="wifi_not_available_please_connect_device_to_drone">Wi-Fi NOT AVAILABLE, PLEASE CONNECT YOUR DEVICE TO YOUR AR.DRONE</string>
@@ -152,6 +150,14 @@
     <string name="your_ar_drone_is_up_to_date">YOUR AR.DRONE IS UP TO DATE</string>
     <string name="not_implemented_yet">NOT IMPLEMENTED YET</string>
     <string name="we_have_no_games_yet">COMING SOON</string>
+
+    <!--my custom string-->
+    <string name="PILOTING">Basic Mode</string>
+    <string name="VOICE_CONTROL">Voice Control</string>
+    <string name="AUTO_CONTROL">Auto Control</string>
+    <string name="PHOTOS_VIDEOS">PHOTOS\nVIDEOS</string>
+    <string name="MY_WAIT_SETTING">MADE BY Zhenyu Song, Yuning Mao, Jiefeng Chen and Boyuan Kong</string>
+
     <!-- GPS dialog -->
     <string name="Location_services_alert">Location Services Alert</string>
     <string name="If_you_want_to_store_your_location_anc_access_your_media_enable_it">If you want to store your location and access your media gallery, enable it in your device\'s settings.</string>

@@ -7,10 +7,6 @@
 
 package com.parrot.freeflight.activities;
 
-import java.io.File;
-import java.util.LinkedList;
-import java.util.List;
-
 import android.annotation.SuppressLint;
 import android.content.ComponentName;
 import android.content.Context;
@@ -70,19 +66,17 @@ import com.parrot.freeflight.settings.ApplicationSettings;
 import com.parrot.freeflight.settings.ApplicationSettings.ControlMode;
 import com.parrot.freeflight.settings.ApplicationSettings.EAppSettingProperty;
 import com.parrot.freeflight.transcodeservice.TranscodingService;
-import com.parrot.freeflight.ui.HudViewController;
-import com.parrot.freeflight.ui.HudViewController.JoystickType;
+import com.parrot.freeflight.ui.VoiceHudViewController;
 import com.parrot.freeflight.ui.SettingsDialogDelegate;
-import com.parrot.freeflight.ui.hud.AcceleroJoystick;
-import com.parrot.freeflight.ui.hud.AnalogueJoystick;
-import com.parrot.freeflight.ui.hud.JoystickBase;
-import com.parrot.freeflight.ui.hud.JoystickFactory;
-import com.parrot.freeflight.ui.hud.JoystickListener;
 import com.parrot.freeflight.utils.NookUtils;
 import com.parrot.freeflight.utils.SystemUtils;
 
+import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
+
 @SuppressLint("NewApi")
-public class ControlDroneActivity
+public class VoiceControlDroneActivity
         extends ParrotActivity
         implements DeviceOrientationChangeDelegate, WifiSignalStrengthReceiverDelegate, DroneVideoRecordStateReceiverDelegate, DroneEmergencyChangeReceiverDelegate,
         DroneBatteryChangedReceiverDelegate, DroneFlyingStateReceiverDelegate, DroneCameraReadyActionReceiverDelegate, DroneRecordReadyActionReceiverDelegate, SettingsDialogDelegate
@@ -101,10 +95,10 @@ public class ControlDroneActivity
     private ApplicationSettings settings;
     private SettingsDialog settingsDialog;
 
-    private JoystickListener rollPitchListener;
-    private JoystickListener gazYawListener;
+    //private JoystickListener rollPitchListener;
+    //private JoystickListener gazYawListener;
 
-    private HudViewController view;
+    private VoiceHudViewController view;
 
     private boolean useSoftwareRendering;
    // private boolean forceCombinedControlMode;
@@ -205,9 +199,9 @@ public class ControlDroneActivity
         acceleroEnabled = false;
         running = false;
 
-        initRegularJoystics();       
+        //initRegularJoystics();
 
-        view = new HudViewController(this, useSoftwareRendering);
+        view = new VoiceHudViewController(this, useSoftwareRendering);
 
         wifiSignalReceiver = new WifiSignalStrengthChangedReceiver(this);
         videoRecordingStateReceiver = new DroneVideoRecordingStateReceiver(this);
@@ -241,90 +235,90 @@ public class ControlDroneActivity
         }
     }
 
-    private void initRegularJoystics()
-    {
-        rollPitchListener = new JoystickListener()
-        {
-
-            public void onChanged(JoystickBase joy, float x, float y)
-            {
-                if (droneControlService != null && acceleroEnabled == false && running == true) {
-                    droneControlService.setRoll(x);
-                    droneControlService.setPitch(-y);
-                }
-            }
-
-            @Override
-            public void onPressed(JoystickBase joy)
-            {
-                leftJoyPressed = true;
-
-                if (droneControlService != null) {
-                    droneControlService.setProgressiveCommandEnabled(true);
-
-                    if (combinedYawEnabled && rightJoyPressed) {
-                        droneControlService.setProgressiveCommandCombinedYawEnabled(true);
-                    } else {
-                        droneControlService.setProgressiveCommandCombinedYawEnabled(false);
-                    }
-                }
-
-                running = true;
-            }
-
-            @Override
-            public void onReleased(JoystickBase joy)
-            {
-                leftJoyPressed = false;
-
-                if (droneControlService != null) {
-                    droneControlService.setProgressiveCommandEnabled(false);
-
-                    if (combinedYawEnabled) {
-                        droneControlService.setProgressiveCommandCombinedYawEnabled(false);
-                    }
-                }
-
-                running = false;
-            }
-        };
-
-        gazYawListener = new JoystickListener()
-        {
-
-            public void onChanged(JoystickBase joy, float x, float y)
-            {
-                if (droneControlService != null) {
-                    droneControlService.setGaz(y);
-                    droneControlService.setYaw(x);
-                }
-            }
-
-            @Override
-            public void onPressed(JoystickBase joy)
-            {
-                rightJoyPressed = true;
-
-                if (droneControlService != null) {
-                    if (combinedYawEnabled && leftJoyPressed) {
-                        droneControlService.setProgressiveCommandCombinedYawEnabled(true);
-                    } else {
-                        droneControlService.setProgressiveCommandCombinedYawEnabled(false);
-                    }
-                }
-            }
-
-            @Override
-            public void onReleased(JoystickBase joy)
-            {
-                rightJoyPressed = false;
-
-                if (droneControlService != null && combinedYawEnabled) {
-                    droneControlService.setProgressiveCommandCombinedYawEnabled(false);
-                }
-            }
-        };
-    }
+//    private void initRegularJoystics()
+//    {
+//        rollPitchListener = new JoystickListener()
+//        {
+//
+//            public void onChanged(JoystickBase joy, float x, float y)
+//            {
+//                if (droneControlService != null && acceleroEnabled == false && running == true) {
+//                    droneControlService.setRoll(x);
+//                    droneControlService.setPitch(-y);
+//                }
+//            }
+//
+//            @Override
+//            public void onPressed(JoystickBase joy)
+//            {
+//                leftJoyPressed = true;
+//
+//                if (droneControlService != null) {
+//                    droneControlService.setProgressiveCommandEnabled(true);
+//
+//                    if (combinedYawEnabled && rightJoyPressed) {
+//                        droneControlService.setProgressiveCommandCombinedYawEnabled(true);
+//                    } else {
+//                        droneControlService.setProgressiveCommandCombinedYawEnabled(false);
+//                    }
+//                }
+//
+//                running = true;
+//            }
+//
+//            @Override
+//            public void onReleased(JoystickBase joy)
+//            {
+//                leftJoyPressed = false;
+//
+//                if (droneControlService != null) {
+//                    droneControlService.setProgressiveCommandEnabled(false);
+//
+//                    if (combinedYawEnabled) {
+//                        droneControlService.setProgressiveCommandCombinedYawEnabled(false);
+//                    }
+//                }
+//
+//                running = false;
+//            }
+//        };
+//
+//        gazYawListener = new JoystickListener()
+//        {
+//
+//            public void onChanged(JoystickBase joy, float x, float y)
+//            {
+//                if (droneControlService != null) {
+//                    droneControlService.setGaz(y);
+//                    droneControlService.setYaw(x);
+//                }
+//            }
+//
+//            @Override
+//            public void onPressed(JoystickBase joy)
+//            {
+//                rightJoyPressed = true;
+//
+//                if (droneControlService != null) {
+//                    if (combinedYawEnabled && leftJoyPressed) {
+//                        droneControlService.setProgressiveCommandCombinedYawEnabled(true);
+//                    } else {
+//                        droneControlService.setProgressiveCommandCombinedYawEnabled(false);
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onReleased(JoystickBase joy)
+//            {
+//                rightJoyPressed = false;
+//
+//                if (droneControlService != null && combinedYawEnabled) {
+//                    droneControlService.setProgressiveCommandCombinedYawEnabled(false);
+//                }
+//            }
+//        };
+//    }
 
     private void initGoogleTVControllers(final ControlButtons buttons)
     {
@@ -559,6 +553,15 @@ public class ControlDroneActivity
 //            }
 //        });
 
+
+        view.setVoiceButtonCLickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+            }
+        });
+
         view.setBtnCameraSwitchClickListener(new OnClickListener()
         {
 
@@ -647,51 +650,51 @@ public class ControlDroneActivity
     }
 
     
-    private void initVirtualJoysticks(JoystickType leftType, JoystickType rightType, boolean isLeftHanded)
-    {
-        JoystickBase joystickLeft = (!isLeftHanded ? view.getJoystickLeft() : view.getJoystickRight());
-        JoystickBase joystickRight = (!isLeftHanded ? view.getJoystickRight() : view.getJoystickLeft());
-
-        ApplicationSettings settings = getSettings();
-
-        if (leftType == JoystickType.ANALOGUE) {
-            if (joystickLeft == null || !(joystickLeft instanceof AnalogueJoystick) || joystickLeft.isAbsoluteControl() != settings.isAbsoluteControlEnabled()) {
-                joystickLeft = JoystickFactory.createAnalogueJoystick(this, settings.isAbsoluteControlEnabled(), rollPitchListener);
-            } else {
-                joystickLeft.setOnAnalogueChangedListener(rollPitchListener);
-                joystickRight.setAbsolute(settings.isAbsoluteControlEnabled());
-            }
-        } else if (leftType == JoystickType.ACCELERO) {
-            if (joystickLeft == null || !(joystickLeft instanceof AcceleroJoystick) || joystickLeft.isAbsoluteControl() != settings.isAbsoluteControlEnabled()) {
-                joystickLeft = JoystickFactory.createAcceleroJoystick(this, settings.isAbsoluteControlEnabled(), rollPitchListener);
-            } else {
-                joystickLeft.setOnAnalogueChangedListener(rollPitchListener);
-                joystickRight.setAbsolute(settings.isAbsoluteControlEnabled());
-            }
-        }
-
-        if (rightType == JoystickType.ANALOGUE) {
-            if (joystickRight == null || !(joystickRight instanceof AnalogueJoystick) || joystickRight.isAbsoluteControl() != settings.isAbsoluteControlEnabled()) {
-                joystickRight = JoystickFactory.createAnalogueJoystick(this, false, gazYawListener);
-            } else {
-                joystickRight.setOnAnalogueChangedListener(gazYawListener);
-                joystickRight.setAbsolute(false);
-            }
-        } else if (rightType == JoystickType.ACCELERO) {
-            if (joystickRight == null || !(joystickRight instanceof AcceleroJoystick) || joystickRight.isAbsoluteControl() != settings.isAbsoluteControlEnabled()) {
-                joystickRight = JoystickFactory.createAcceleroJoystick(this, false, gazYawListener);
-            } else {
-                joystickRight.setOnAnalogueChangedListener(gazYawListener);
-                joystickRight.setAbsolute(false);
-            }
-        }
-
-        if (!isLeftHanded) {
-            view.setJoysticks(joystickLeft, joystickRight);
-        } else {
-            view.setJoysticks(joystickRight, joystickLeft);
-        }
-    }
+//    private void initVirtualJoysticks(JoystickType leftType, JoystickType rightType, boolean isLeftHanded)
+//    {
+//        JoystickBase joystickLeft = (!isLeftHanded ? view.getJoystickLeft() : view.getJoystickRight());
+//        JoystickBase joystickRight = (!isLeftHanded ? view.getJoystickRight() : view.getJoystickLeft());
+//
+//        ApplicationSettings settings = getSettings();
+//
+//        if (leftType == JoystickType.ANALOGUE) {
+//            if (joystickLeft == null || !(joystickLeft instanceof AnalogueJoystick) || joystickLeft.isAbsoluteControl() != settings.isAbsoluteControlEnabled()) {
+//                joystickLeft = JoystickFactory.createAnalogueJoystick(this, settings.isAbsoluteControlEnabled(), rollPitchListener);
+//            } else {
+//                joystickLeft.setOnAnalogueChangedListener(rollPitchListener);
+//                joystickRight.setAbsolute(settings.isAbsoluteControlEnabled());
+//            }
+//        } else if (leftType == JoystickType.ACCELERO) {
+//            if (joystickLeft == null || !(joystickLeft instanceof AcceleroJoystick) || joystickLeft.isAbsoluteControl() != settings.isAbsoluteControlEnabled()) {
+//                joystickLeft = JoystickFactory.createAcceleroJoystick(this, settings.isAbsoluteControlEnabled(), rollPitchListener);
+//            } else {
+//                joystickLeft.setOnAnalogueChangedListener(rollPitchListener);
+//                joystickRight.setAbsolute(settings.isAbsoluteControlEnabled());
+//            }
+//        }
+//
+//        if (rightType == JoystickType.ANALOGUE) {
+//            if (joystickRight == null || !(joystickRight instanceof AnalogueJoystick) || joystickRight.isAbsoluteControl() != settings.isAbsoluteControlEnabled()) {
+//                joystickRight = JoystickFactory.createAnalogueJoystick(this, false, gazYawListener);
+//            } else {
+//                joystickRight.setOnAnalogueChangedListener(gazYawListener);
+//                joystickRight.setAbsolute(false);
+//            }
+//        } else if (rightType == JoystickType.ACCELERO) {
+//            if (joystickRight == null || !(joystickRight instanceof AcceleroJoystick) || joystickRight.isAbsoluteControl() != settings.isAbsoluteControlEnabled()) {
+//                joystickRight = JoystickFactory.createAcceleroJoystick(this, false, gazYawListener);
+//            } else {
+//                joystickRight.setOnAnalogueChangedListener(gazYawListener);
+//                joystickRight.setAbsolute(false);
+//            }
+//        }
+//
+////        if (!isLeftHanded) {
+////            view.setJoysticks(joystickLeft, joystickRight);
+////        } else {
+////            view.setJoysticks(joystickRight, joystickLeft);
+////        }
+//    }
 
     @Override
     protected void onDestroy()
@@ -962,20 +965,20 @@ public class ControlDroneActivity
     
     private void applyJoypadConfig(ControlMode controlMode, boolean isLeftHanded)
     {
-        switch (controlMode) {
-        case NORMAL_MODE:
-            initVirtualJoysticks(JoystickType.ANALOGUE, JoystickType.ANALOGUE, isLeftHanded);
-            acceleroEnabled = false;
-            break;
-        case ACCELERO_MODE:
-            initVirtualJoysticks(JoystickType.ACCELERO, JoystickType.ANALOGUE, isLeftHanded);
-            acceleroEnabled = true;
-            break;
-        case ACE_MODE:
-            initVirtualJoysticks(JoystickType.NONE, JoystickType.COMBINED, isLeftHanded);
-            acceleroEnabled = true;
-            break;
-        }
+//        switch (controlMode) {
+//        case NORMAL_MODE:
+//            initVirtualJoysticks(JoystickType.ANALOGUE, JoystickType.ANALOGUE, isLeftHanded);
+//            acceleroEnabled = false;
+//            break;
+//        case ACCELERO_MODE:
+//            initVirtualJoysticks(JoystickType.ACCELERO, JoystickType.ANALOGUE, isLeftHanded);
+//            acceleroEnabled = true;
+//            break;
+//        case ACE_MODE:
+//            initVirtualJoysticks(JoystickType.NONE, JoystickType.COMBINED, isLeftHanded);
+//            acceleroEnabled = true;
+//            break;
+//        }
     }
     
     

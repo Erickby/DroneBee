@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Freeflight.iml" filepath="$PROJECT_DIR$/Freeflight.iml" />
+      <module fileurl="file://$PROJECT_DIR$/DroneBee.iml" filepath="$PROJECT_DIR$/DroneBee.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
