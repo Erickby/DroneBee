@@ -18,16 +18,16 @@
         android:layout_centerVertical="true"
         android:text="@string/ar_drone_update" android:gravity="center" android:layout_width="wrap_content"/>
 
-    <Button
-        android:id="@+id/btnShare"
-        style="@style/PhotoVideoActionButton"
-        android:layout_width="wrap_content"
-        android:layout_height="fill_parent"
-        android:layout_alignParentRight="true"
-        android:drawableLeft="@drawable/btn_share"
-        android:drawablePadding="@dimen/photo_video_button_drawable_padding"
-        android:text="@string/share_capit"
-        android:visibility="gone" />
+    <!--<Button-->
+        <!--android:id="@+id/btnShare"-->
+        <!--style="@style/PhotoVideoActionButton"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="fill_parent"-->
+        <!--android:layout_alignParentRight="true"-->
+        <!--android:drawableLeft="@drawable/btn_share"-->
+        <!--android:drawablePadding="@dimen/photo_video_button_drawable_padding"-->
+        <!--android:text="@string/share_capit"-->
+        <!--android:visibility="gone" />-->
 
     <LinearLayout
         android:id="@+id/webButtons"

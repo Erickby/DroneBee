@@ -73,9 +73,9 @@ public class ActionBar implements OnClickListener
 	
 	public void initShareButton(OnClickListener listener)
 	{
-		final Button btnShare = (Button) view.findViewById(R.id.btnShare);
-		btnShare.setOnClickListener(listener);
-		btnShare.setVisibility(View.VISIBLE);
+//		final Button btnShare = (Button) view.findViewById(R.id.btnShare);
+//		btnShare.setOnClickListener(listener);
+//		btnShare.setVisibility(View.VISIBLE);
 	}
 	
 	

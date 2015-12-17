@@ -130,9 +130,9 @@ public class GalleryActivity extends ParrotActivity
 
     public void onClick(final View v)
     {
-        if (v.getId() == R.id.btnShare) {
-            onShareClicked();
-        }
+//        if (v.getId() == R.id.btnShare) {
+//            onShareClicked();
+//        }
     }
 
 

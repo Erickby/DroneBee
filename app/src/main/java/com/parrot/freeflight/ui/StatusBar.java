@@ -86,12 +86,12 @@ public final class StatusBar
 
 	private void updateTime()
 	{
-		TextView txtTime = (TextView) headerView.findViewById(R.id.txtTime);
+//		TextView txtTime = (TextView) headerView.findViewById(R.id.txtTime);
 
 		Date date = new Date(System.currentTimeMillis());
 
 		String time = android.text.format.DateFormat.getTimeFormat(activity).format(date);
-		txtTime.setText(time);
+//		txtTime.setText(time);
 	}
 
 	private void processBatteryEvent(Intent intent)
