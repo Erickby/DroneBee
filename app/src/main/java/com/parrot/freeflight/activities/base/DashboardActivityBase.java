@@ -55,7 +55,7 @@ MediaStorageReceiverDelegate
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.dashboard_screen);
-
+//		setContentView(R.layout.hint_screen_absolute_control);
 		View headerView = findViewById(R.id.header_preferences);
 
 		header = new StatusBar(this, headerView);

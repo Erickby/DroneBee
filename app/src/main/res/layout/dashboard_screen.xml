@@ -40,6 +40,7 @@
             android:text="@string/app_version"
             android:layout_marginBottom="@dimen/dashboard_label_version_margin_bottom"
             android:layout_gravity="bottom"
+            android:textColor="@color/white"
             />
         </LinearLayout>
     </RelativeLayout>

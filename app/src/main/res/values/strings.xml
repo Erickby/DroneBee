@@ -155,7 +155,7 @@
     <string name="PILOTING">Basic Mode</string>
     <string name="VOICE_CONTROL">Voice Control</string>
     <string name="AUTO_CONTROL">Auto Control</string>
-    <string name="PHOTOS_VIDEOS">PHOTOS\nVIDEOS</string>
+    <string name="PHOTOS_VIDEOS">VIDEOS</string>
     <string name="MY_WAIT_SETTING">MADE BY Zhenyu Song, Yuning Mao, Jiefeng Chen and Boyuan Kong</string>
 
     <!-- GPS dialog -->

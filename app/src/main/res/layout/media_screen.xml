@@ -32,80 +32,80 @@
         tools:listitem="@layout/item_image" >
     </GridView>
 
-    <LinearLayout
-        android:id="@+id/llayBrowseBar"
-        android:layout_width="fill_parent"
-        android:layout_height="@dimen/photo_video_bottom_bar_height"
-        android:background="@drawable/black"
-        android:orientation="horizontal" >
+    <!--<LinearLayout-->
+        <!--android:id="@+id/llayBrowseBar"-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="@dimen/photo_video_bottom_bar_height"-->
+        <!--android:background="@drawable/black"-->
+        <!--android:orientation="horizontal" >-->
 
-        <TextView
-            style="@style/PhotoVideoText"
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:layout_marginLeft="@dimen/orange_bar_title_text_margin"
-            android:text="@string/sort" 
-            android:lineSpacingExtra="0dp"
-            android:lineSpacingMultiplier="1"
-            />
+        <!--<TextView-->
+            <!--style="@style/PhotoVideoText"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="fill_parent"-->
+            <!--android:layout_marginLeft="@dimen/orange_bar_title_text_margin"-->
+            <!--android:text="@string/sort" -->
+            <!--android:lineSpacingExtra="0dp"-->
+            <!--android:lineSpacingMultiplier="1"-->
+            <!--/>-->
 
-        <RadioGroup
-            android:id="@+id/filter"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="1.0"
-            android:orientation="horizontal" >
+        <!--<RadioGroup-->
+            <!--android:id="@+id/filter"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_gravity="center_vertical"-->
+            <!--android:layout_weight="1.0"-->
+            <!--android:orientation="horizontal" >-->
 
-            <RadioButton
-                android:id="@+id/rbtn_all"
-                style="@style/MediaGallery.FilterPhotoVideo"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginLeft="@dimen/photo_video_white_separator_margin"
-                android:layout_marginRight="@dimen/photo_video_white_separator_margin"
-                android:checked="true" />
+            <!--<RadioButton-->
+                <!--android:id="@+id/rbtn_all"-->
+                <!--style="@style/MediaGallery.FilterPhotoVideo"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="match_parent"-->
+                <!--android:layout_marginLeft="@dimen/photo_video_white_separator_margin"-->
+                <!--android:layout_marginRight="@dimen/photo_video_white_separator_margin"-->
+                <!--android:checked="true" />-->
 
-            <ImageView
-                android:layout_width="@dimen/photo_video_white_separator_width"
-                android:layout_height="@dimen/photo_video_white_separator_height"
-                android:layout_gravity="center_vertical"
-                android:scaleType="fitXY"
-                android:src="@color/white" />
+            <!--<ImageView-->
+                <!--android:layout_width="@dimen/photo_video_white_separator_width"-->
+                <!--android:layout_height="@dimen/photo_video_white_separator_height"-->
+                <!--android:layout_gravity="center_vertical"-->
+                <!--android:scaleType="fitXY"-->
+                <!--android:src="@color/white" />-->
 
-            <RadioButton
-                android:id="@+id/rbtn_images"
-                style="@style/MediaGallery.FilterPhoto"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="center_vertical"
-                android:layout_marginLeft="@dimen/photo_video_white_separator_margin"
-                android:layout_marginRight="@dimen/photo_video_white_separator_margin" />
+            <!--<RadioButton-->
+                <!--android:id="@+id/rbtn_images"-->
+                <!--style="@style/MediaGallery.FilterPhoto"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="match_parent"-->
+                <!--android:layout_gravity="center_vertical"-->
+                <!--android:layout_marginLeft="@dimen/photo_video_white_separator_margin"-->
+                <!--android:layout_marginRight="@dimen/photo_video_white_separator_margin" />-->
 
-            <ImageView
-                android:layout_width="@dimen/photo_video_white_separator_width"
-                android:layout_height="@dimen/photo_video_white_separator_height"
-                android:layout_gravity="center_vertical"
-                android:scaleType="fitXY"
-                android:src="@color/white" />
+            <!--<ImageView-->
+                <!--android:layout_width="@dimen/photo_video_white_separator_width"-->
+                <!--android:layout_height="@dimen/photo_video_white_separator_height"-->
+                <!--android:layout_gravity="center_vertical"-->
+                <!--android:scaleType="fitXY"-->
+                <!--android:src="@color/white" />-->
 
-            <RadioButton
-                android:id="@+id/rbtn_videos"
-                style="@style/MediaGallery.FilterVideo"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="center_vertical"
-                android:layout_marginLeft="@dimen/photo_video_white_separator_margin"
-                android:layout_marginRight="@dimen/photo_video_white_separator_margin" />
-        </RadioGroup>
+            <!--<RadioButton-->
+                <!--android:id="@+id/rbtn_videos"-->
+                <!--style="@style/MediaGallery.FilterVideo"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="match_parent"-->
+                <!--android:layout_gravity="center_vertical"-->
+                <!--android:layout_marginLeft="@dimen/photo_video_white_separator_margin"-->
+                <!--android:layout_marginRight="@dimen/photo_video_white_separator_margin" />-->
+        <!--</RadioGroup>-->
 
-        <Button
-            android:id="@+id/btnEdit"
-            style="@style/PhotoVideoGreyButton"
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:text="@string/edit" />
-    </LinearLayout>
+        <!--<Button-->
+            <!--android:id="@+id/btnEdit"-->
+            <!--style="@style/PhotoVideoGreyButton"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="fill_parent"-->
+            <!--android:text="@string/edit" />-->
+    <!--</LinearLayout>-->
 
     <LinearLayout
         android:id="@+id/llayEditBar"

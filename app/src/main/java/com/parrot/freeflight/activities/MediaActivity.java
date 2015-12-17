@@ -105,11 +105,11 @@ public class MediaActivity extends ParrotActivity
 
     private void initListeners()
     {
-        final RadioGroup filter = (RadioGroup) findViewById(R.id.filter);
-        filter.setOnCheckedChangeListener(this);
-
-        final Button btnEdit = (Button) findViewById(R.id.btnEdit);
-        btnEdit.setOnClickListener(this);
+//        final RadioGroup filter = (RadioGroup) findViewById(R.id.filter);
+//        filter.setOnCheckedChangeListener(this);
+//
+//        final Button btnEdit = (Button) findViewById(R.id.btnEdit);
+//        btnEdit.setOnClickListener(this);
 
         final Button btnCancel = (Button) findViewById(R.id.btnCancel);
         btnCancel.setOnClickListener(this);
@@ -361,16 +361,16 @@ public class MediaActivity extends ParrotActivity
 
     private void initActionBar(final ActionBarState state)
     {
-        final LinearLayout browseBar = (LinearLayout) findViewById(R.id.llayBrowseBar);
+//        final LinearLayout browseBar = (LinearLayout) findViewById(R.id.llayBrowseBar);
         final LinearLayout editBar = (LinearLayout) findViewById(R.id.llayEditBar);
 
         switch (state) {
         case BROWSE:
-            browseBar.setVisibility(View.VISIBLE);
+//            browseBar.setVisibility(View.VISIBLE);
             editBar.setVisibility(View.GONE);
             break;
         case EDIT:
-            browseBar.setVisibility(View.GONE);
+//            browseBar.setVisibility(View.GONE);
             editBar.setVisibility(View.VISIBLE);
             break;
 
@@ -399,15 +399,15 @@ public class MediaActivity extends ParrotActivity
     public void onCheckedChanged(final RadioGroup group, final int checkedId)
     {
         switch (checkedId) {
-        case R.id.rbtn_images:
-            currentFilter = MediaFilter.IMAGES;
-            break;
-
-        case R.id.rbtn_videos:
-            currentFilter = MediaFilter.VIDEOS;
-            break;
-
-        case R.id.rbtn_all:
+//        case R.id.rbtn_images:
+//            currentFilter = MediaFilter.IMAGES;
+//            break;
+//
+//        case R.id.rbtn_videos:
+//            currentFilter = MediaFilter.VIDEOS;
+//            break;
+//
+//        case R.id.rbtn_all:
         default:
             currentFilter = MediaFilter.ALL;
             break;
@@ -422,9 +422,9 @@ public class MediaActivity extends ParrotActivity
         final int id = v.getId();
 
         switch (id) {
-        case R.id.btnEdit:
-            onEditClicked();
-            break;
+//        case R.id.btnEdit:
+//            onEditClicked();
+//            break;
         case R.id.btnCancel:
             onCancelEditClicked();
             break;

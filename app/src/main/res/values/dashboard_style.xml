@@ -14,7 +14,7 @@
     <style name="dashboardButtonBase" parent="@android:style/TextAppearance.DeviceDefault.Widget.Button">
         <item name="android:background">@drawable/dashboard_button</item>
         <item name="android:textColor">#FFFFFFFF</item>
-        <item name="android:gravity">right|bottom</item>
+        <item name="android:gravity">center_horizontal|center_vertical</item>
         <item name="android:singleLine">false</item>
     </style>
 
