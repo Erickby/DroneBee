@@ -96,14 +96,14 @@ public final class StatusBar
 
 	private void processBatteryEvent(Intent intent)
 	{
-		TextView txtBatteryState = (TextView) headerView.findViewById(R.id.txtBatteryStatus);
-		ImageView imgBatteryIcon = (ImageView) headerView.findViewById(R.id.imgBattery);
+//		TextView txtBatteryState = (TextView) headerView.findViewById(R.id.txtBatteryStatus);
+//		ImageView imgBatteryIcon = (ImageView) headerView.findViewById(R.id.imgBattery);
 		String action = intent.getAction();
 
 		if (action.equals(Intent.ACTION_BATTERY_CHANGED))
 		{
 			int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
-			txtBatteryState.setText("" + level + "%");
+//			txtBatteryState.setText("" + level + "%");
 
 			Resources res = activity.getResources();
 
@@ -126,7 +126,7 @@ public final class StatusBar
 				levelIdx = 5;
 			}
 
-			imgBatteryIcon.setImageDrawable(res.getDrawable(batteryIndicatorIds[levelIdx]));
+//			imgBatteryIcon.setImageDrawable(res.getDrawable(batteryIndicatorIds[levelIdx]));
 		}
 	}
 }

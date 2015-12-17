@@ -30,32 +30,32 @@
             android:gravity="right"
             android:text="@string/preferences" android:visibility="gone" android:layout_marginLeft="@dimen/top_panel_text_margin_left"/>
 
-        <ImageView
-            android:id="@+id/imgBattery"
-            style="@style/toppanel.text"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:background="@color/white"
-            android:src="@drawable/ff2_battery_100" android:scaleType="fitCenter" android:padding="0dp" android:scrollY="-1dp"/>
+        <!--<ImageView-->
+            <!--android:id="@+id/imgBattery"-->
+            <!--style="@style/toppanel.text"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_alignParentLeft="true"-->
+            <!--android:layout_centerVertical="true"-->
+            <!--android:background="@color/white"-->
+            <!--android:src="@drawable/ff2_battery_100" android:scaleType="fitCenter" android:padding="0dp" android:scrollY="-1dp"/>-->
 
-        <TextView
-            android:id="@+id/txtBatteryStatus"
-            style="@style/toppanel.text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_toRightOf="@+id/imgBattery"
-            android:text="100%"
-            android:textAllCaps="true" android:layout_marginLeft="@dimen/top_panel_text_margin_left" android:gravity="left|center_vertical"/>
+        <!--<TextView-->
+            <!--android:id="@+id/txtBatteryStatus"-->
+            <!--style="@style/toppanel.text"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_centerVertical="true"-->
+            <!--android:layout_toRightOf="@+id/imgBattery"-->
+            <!--android:text="100%"-->
+            <!--android:textAllCaps="true" android:layout_marginLeft="@dimen/top_panel_text_margin_left" android:gravity="left|center_vertical"/>-->
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_centerVertical="true"
-            android:layout_toLeftOf="@+id/txtTime"
-            android:src="@drawable/ff2_top_bar_time" android:scaleType="center" android:scrollY="-1dp"/>
+        <!--<ImageView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_centerVertical="true"-->
+            <!--android:layout_toLeftOf="@+id/txtTime"-->
+            <!--android:src="@drawable/ff2_top_bar_time" android:scaleType="center" android:scrollY="-1dp"/>-->
 
         <ImageView
             android:layout_width="wrap_content"

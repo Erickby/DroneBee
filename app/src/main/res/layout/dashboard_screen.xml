@@ -15,23 +15,33 @@
         android:layout_width="match_parent"
         android:layout_height="0dp" android:layout_weight="1">
 
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+             >
+
         <ImageView
             android:id="@+id/imgLogo"
             style="@style/dashboardLogo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ff2_logo_freeflight"
-            android:paddingBottom="@dimen/dashboard_logo_padding_bottom" />
+            />
+            <!--android:layout_alignParentBottom="true"-->
+            <!--android:layout_alignParentTop="true" />-->
 
         <TextView
             android:id="@+id/txtVersion"
             style="@style/dashboardLabelVersion"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
             android:layout_marginLeft="@dimen/dashboard_label_version_margin_left"
-            android:layout_toRightOf="@+id/imgLogo"
-            android:text="@string/app_version" android:layout_alignBottom="@id/imgLogo" android:layout_marginBottom="@dimen/dashboard_label_version_margin_bottom"/>
+            android:text="@string/app_version"
+            android:layout_marginBottom="@dimen/dashboard_label_version_margin_bottom"
+            android:layout_gravity="bottom"
+            />
+        </LinearLayout>
     </RelativeLayout>
 
     <LinearLayout
