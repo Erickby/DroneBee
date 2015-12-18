@@ -151,6 +151,7 @@ public class HudViewController
 		//btnSettings = new Button(res, R.drawable.btn_settings, R.drawable.btn_settings_pressed, Align.TOP_LEFT);
 		//btnSettings.setMargin(0, 0, 0, (int)res.getDimension(R.dimen.hud_btn_settings_margin_left));
 		
+		//btnBack = new Button(res, R.drawable.btn_back, R.drawable.btn_back_pressed, Align.TOP_LEFT);
 		btnBack = new Button(res, R.drawable.btn_back, R.drawable.btn_back_pressed, Align.TOP_LEFT);
 		btnBack.setMargin(0, 0, 0, res.getDimensionPixelOffset(R.dimen.hud_btn_back_margin_left));
 		
@@ -172,6 +173,7 @@ public class HudViewController
 		btnRecord = new ToggleButton(res, R.drawable.btn_record, R.drawable.btn_record_pressed, 
 		                                    R.drawable.btn_record1, R.drawable.btn_record1_pressed,
 		                                    R.drawable.btn_record2, Align.TOP_RIGHT);
+		btnRecord.setMargin(0,res.getDimensionPixelOffset(R.dimen.hud_btn_rec_margin_right),0,0);
 //		btnRecord.setMargin(0, res.getDimensionPixelOffset(R.dimen.hud_btn_rec_margin_right), 0, 0);
 		
 //		txtRecord = new Text(context, "REC", Align.TOP_RIGHT);
@@ -191,7 +193,7 @@ public class HudViewController
 //		txtUsbRemaining.setTextSize(res.getDimensionPixelSize(R.dimen.hud_usb_indicator_text_size));
 		
 		btnCameraSwitch = new Button(res, R.drawable.btn_camera, R.drawable.btn_camera_pressed, Align.TOP_RIGHT);
-		btnCameraSwitch.setMargin(0, res.getDimensionPixelOffset(R.dimen.hud_btn_rec_margin_right), 0, 0);
+		btnCameraSwitch.setMargin(0, res.getDimensionPixelOffset(R.dimen.hud_btn_rec_true_margin_right), 0, 0);
 		
 		int batteryIndicatorRes[] = {R.drawable.btn_battery_0,
 									R.drawable.btn_battery_1,

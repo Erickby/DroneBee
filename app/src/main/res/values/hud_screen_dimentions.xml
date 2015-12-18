@@ -13,6 +13,8 @@
     <dimen name="hud_rec_text_margin_right">93dp</dimen>
     <dimen name="hud_btn_camera_switch_margin_right">145dp</dimen>
     <dimen name="hud_btn_rec_margin_right">81dp</dimen>
+    <dimen name="hud_btn_rec_true_margin_right">25dp</dimen>
+
     <dimen name="hud_usb_indicator_margin_right">75dp</dimen>
     <dimen name="hud_usb_indicator_text_size">@dimen/hud_battery_text_size</dimen>
     <dimen name="hud_usb_indicator_text_margin_right">53dp</dimen>

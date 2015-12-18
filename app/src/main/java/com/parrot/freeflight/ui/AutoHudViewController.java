@@ -172,6 +172,8 @@ public class AutoHudViewController
 		btnRecord = new ToggleButton(res, R.drawable.btn_record, R.drawable.btn_record_pressed, 
 		                                    R.drawable.btn_record1, R.drawable.btn_record1_pressed,
 		                                    R.drawable.btn_record2, Align.TOP_RIGHT);
+		btnRecord.setMargin(0,res.getDimensionPixelOffset(R.dimen.hud_btn_rec_margin_right),0,0);
+//
 //		btnRecord.setMargin(0, res.getDimensionPixelOffset(R.dimen.hud_btn_rec_margin_right), 0, 0);
 		
 //		txtRecord = new Text(context, "REC", Align.TOP_RIGHT);
@@ -191,8 +193,8 @@ public class AutoHudViewController
 //		txtUsbRemaining.setTextSize(res.getDimensionPixelSize(R.dimen.hud_usb_indicator_text_size));
 		
 		btnCameraSwitch = new Button(res, R.drawable.btn_camera, R.drawable.btn_camera_pressed, Align.TOP_RIGHT);
-		btnCameraSwitch.setMargin(0, res.getDimensionPixelOffset(R.dimen.hud_btn_rec_margin_right), 0, 0);
-		
+		btnCameraSwitch.setMargin(0, res.getDimensionPixelOffset(R.dimen.hud_btn_rec_true_margin_right), 0, 0);
+
 		int batteryIndicatorRes[] = {R.drawable.btn_battery_0,
 									R.drawable.btn_battery_1,
 									R.drawable.btn_battery_2,
