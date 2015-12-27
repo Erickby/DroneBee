@@ -13,7 +13,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.graphics.Bitmap;
 import android.media.AudioManager;
+import android.media.MediaMetadataRetriever;
 import android.media.SoundPool;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
@@ -30,8 +32,6 @@ import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.aispeech.AIError;
@@ -41,7 +41,6 @@ import com.aispeech.common.Util;
 import com.aispeech.export.engines.AILocalGrammarEngine;
 import com.aispeech.export.engines.AIMixASREngine;
 import com.aispeech.export.listeners.AIASRListener;
-import com.aispeech.export.listeners.AILocalGrammarListener;
 import com.parrot.freeflight.FreeFlightApplication;
 import com.parrot.freeflight.R;
 import com.parrot.freeflight.activities.base.ParrotActivity;
@@ -77,8 +76,9 @@ import com.parrot.freeflight.settings.ApplicationSettings;
 import com.parrot.freeflight.settings.ApplicationSettings.ControlMode;
 import com.parrot.freeflight.settings.ApplicationSettings.EAppSettingProperty;
 import com.parrot.freeflight.transcodeservice.TranscodingService;
-import com.parrot.freeflight.ui.VoiceHudViewController;
 import com.parrot.freeflight.ui.SettingsDialogDelegate;
+import com.parrot.freeflight.ui.VoiceHudViewController;
+import com.parrot.freeflight.utils.FileUtils;
 import com.parrot.freeflight.utils.NookUtils;
 import com.parrot.freeflight.utils.SystemUtils;
 import com.parrot.util.NetworkUtil;
@@ -87,10 +87,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -340,6 +337,115 @@ public class VoiceControlDroneActivity
 //            }
 //        };
 //    }
+
+    class RecordThread extends Thread
+    {
+        private long startTime = 0;
+        private long endTime = 0;
+        private boolean takePhoto = true;
+        @Override
+        public synchronized void run()
+        {
+            Log.i("tttt", "RecordThread start.");
+            while (takePhoto) {
+                if (startTime == 0) {
+                    onRecord();
+                    startTime = System.currentTimeMillis(); //毫秒
+                }
+                endTime = System.currentTimeMillis();
+                long dt = (endTime - startTime);
+
+                if (dt > 1500) {
+                    onRecord();
+                    GetandSaveCurrentImage();
+                    takePhoto = false;
+                    /*try {
+                        Thread.sleep(1000);  //保证视频已经写入
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }*/
+                    //while (!faceDetectFinished); //等待人脸图片生成
+                    Log.i("tttt", "face finish.");
+                }
+            }
+        }
+    }
+
+    private File GetNewestFile(String Path, String Extension)
+    {
+        try {
+            Thread.sleep(500);  //保证视频已经写入
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        File result = null;
+        File[] files =new File(Path).listFiles();
+
+        long modifiedTime = Long.MIN_VALUE;
+
+        for (int i =0; i < files.length; i++) {
+            File f = files[i];
+            //Log.i("tttt",f.getPath());
+            if (f!=null && f.isFile()) {
+                //Log.i("tttt", "optional:" + f.getPath());
+                if (f.getPath().substring(f.getPath().length() - Extension.length()).equals(Extension)) { //判断扩展名{
+                    if (f.lastModified() > modifiedTime) {
+                        result = f;
+                        modifiedTime = f.lastModified();
+                    }
+                }
+            }
+        }
+        //Log.i("tttta", "final" + result.getPath());
+        return result;
+
+    }
+
+    private void GetandSaveCurrentImage() {
+        File dcimDir = FileUtils.getMediaFolder(getApplicationContext());
+        String SavePath = dcimDir.getAbsolutePath();
+        //Log.i("tttt", "dir=" + SavePath);
+        File videoFile = GetNewestFile(SavePath, "mp4");
+        Log.i("tttt", "video:"+videoFile.getPath());
+        if (videoFile == null)
+            Log.i("tttt","got no video file.");
+        MediaMetadataRetriever media = new MediaMetadataRetriever();
+        try {
+            String s = videoFile.getPath();
+            String filepath = s;
+            filepath=filepath.replace("mp4","png");
+            Log.i("ttt",filepath);
+            File picFile = new File(filepath);
+            //boolean tt = picFile.exists();
+            //如果没有png
+            if(!picFile.exists()) {
+                //Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
+                //Log.i("tttt", s);
+                media.setDataSource(s);
+                Bitmap bitmap = media.getFrameAtTime();
+                if (bitmap != null) {
+                    File path = new File(SavePath);
+                    if (!path.exists()) {
+                        path.mkdirs();
+                    }
+                    if (!picFile.exists()) {
+                        picFile.createNewFile();
+                    }
+                    FileOutputStream fos = null;
+                    fos = new FileOutputStream(picFile);
+                    if (null != fos) {
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 90, fos);
+                        fos.flush();
+                        fos.close();
+                    }
+                }
+                if (videoFile != null)
+                    videoFile.delete();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     private void initGoogleTVControllers(final ControlButtons buttons)
     {
@@ -633,6 +739,7 @@ public class VoiceControlDroneActivity
             setAsrBtnState(true,true);
         }
 
+
         @Override
         public void onResults(AIResult results) {
             Log.i(TAG, results.getResultObject().toString());
@@ -652,7 +759,7 @@ public class VoiceControlDroneActivity
                             droneControlService.triggerTakeOff();
                             break;
                         case "takephoto":
-                            droneControlService.takePhoto();
+                            new RecordThread().start();
                             break;
                         case "record":
                             droneControlService.record();
@@ -664,28 +771,28 @@ public class VoiceControlDroneActivity
                             droneControlService.triggerEmergency();
                             break;
                         case "moveforward":
-                            droneControlService.moveForward(2);
+                            droneControlService.moveForward(1);
                             break;
                         case "movebackward":
-                            droneControlService.moveBackward(2);
+                            droneControlService.moveBackward(1);
                             break;
                         case "moveup":
-                            droneControlService.moveUp(2);
+                            droneControlService.moveUp(1);
                             break;
                         case "movedown":
-                            droneControlService.moveDown(2);
+                            droneControlService.moveDown(1);
                             break;
                         case "moveleft":
-                            droneControlService.moveLeft(2);
+                            droneControlService.moveLeft(1);
                             break;
                         case "moveright":
-                            droneControlService.moveRight(2);
+                            droneControlService.moveRight(1);
                             break;
                         case "turnleft":
-                            droneControlService.turnLeft(2);
+                            droneControlService.turnLeft(1);
                             break;
                         case "turnright":
-                            droneControlService.turnRight(2);
+                            droneControlService.turnRight(1);
                             break;
                         case "switchcamera":
                             droneControlService.switchCamera();

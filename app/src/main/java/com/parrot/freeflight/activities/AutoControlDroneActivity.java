@@ -13,7 +13,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.media.AudioManager;
+import android.media.MediaMetadataRetriever;
 import android.media.SoundPool;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
@@ -24,13 +29,24 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.GestureDetector.OnDoubleTapListener;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
+import com.google.android.gms.samples.vision.face.patch.SafeFaceDetector;
+import com.google.android.gms.vision.Detector;
+import com.google.android.gms.vision.Frame;
+import com.google.android.gms.vision.face.Face;
+import com.google.android.gms.vision.face.FaceDetector;
+import com.google.android.gms.vision.face.Landmark;
 import com.parrot.freeflight.FreeFlightApplication;
 import com.parrot.freeflight.R;
 import com.parrot.freeflight.activities.base.ParrotActivity;
@@ -67,18 +83,13 @@ import com.parrot.freeflight.settings.ApplicationSettings.ControlMode;
 import com.parrot.freeflight.settings.ApplicationSettings.EAppSettingProperty;
 import com.parrot.freeflight.transcodeservice.TranscodingService;
 import com.parrot.freeflight.ui.AutoHudViewController;
-import com.parrot.freeflight.ui.HudViewController;
-import com.parrot.freeflight.ui.HudViewController.JoystickType;
 import com.parrot.freeflight.ui.SettingsDialogDelegate;
-import com.parrot.freeflight.ui.hud.AcceleroJoystick;
-import com.parrot.freeflight.ui.hud.AnalogueJoystick;
-import com.parrot.freeflight.ui.hud.JoystickBase;
-import com.parrot.freeflight.ui.hud.JoystickFactory;
-import com.parrot.freeflight.ui.hud.JoystickListener;
+import com.parrot.freeflight.utils.FileUtils;
 import com.parrot.freeflight.utils.NookUtils;
 import com.parrot.freeflight.utils.SystemUtils;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -148,6 +159,9 @@ public class AutoControlDroneActivity
 
     private List<ButtonController> buttonControllers;
 
+    private boolean rotatingandDetecting;
+    private boolean faceGet;
+
     private ServiceConnection mConnection = new ServiceConnection()
     {
 
@@ -162,6 +176,194 @@ public class AutoControlDroneActivity
             droneControlService = null;
         }
     };
+
+    private Bitmap faceDetectandDraw(Bitmap bitmap)
+    {
+        FaceDetector detector = new FaceDetector.Builder(getApplicationContext())
+                .setClassificationType(FaceDetector.ALL_CLASSIFICATIONS)
+                .setTrackingEnabled(false)
+                .setLandmarkType(FaceDetector.ALL_LANDMARKS)
+                .build();
+        Detector<Face> safeDetector = new SafeFaceDetector(detector);
+
+        // Create a frame from the bitmap and run face detection on the frame.
+        int scale = 1;
+        Bitmap resizedBitmap = bitmap.createScaledBitmap(
+                bitmap, bitmap.getWidth() / scale, bitmap.getHeight() / scale, false);
+
+        Frame frame = new Frame.Builder().setBitmap(resizedBitmap).build();
+        Log.i("tttt", "faceDetecting...");
+
+        runOnUiThread(new Runnable() {
+            public void run() {
+                Toast.makeText(getApplicationContext(), "face detecting...", Toast.LENGTH_SHORT).show();
+            }
+        });
+        SparseArray<Face> faces = safeDetector.detect(frame);
+        Log.i("tttt","faceDetect finished");
+        if (!safeDetector.isOperational()) {
+            // Note: The first time that an app using face API is installed on a device, GMS will
+            // download a native library to the device in order to do detection.  Usually this
+            // completes before the app is run for the first time.  But if that download has not yet
+            // completed, then the above call will not detect any faces.
+            //
+            // isOperational() can be used to check if the required native library is currently
+            // available.  The detector will automatically become operational once the library
+            // download completes on device.
+            Log.w(TAG, "Face detector dependencies are not yet available.");
+
+            // Check for low storage.  If there is low storage, the native library will not be
+            // downloaded, so detection will not become operational.
+            IntentFilter lowstorageFilter = new IntentFilter(Intent.ACTION_DEVICE_STORAGE_LOW);
+            boolean hasLowStorage = registerReceiver(null, lowstorageFilter) != null;
+
+            if (hasLowStorage) {
+                //Toast.makeText(this,"low storage", Toast.LENGTH_LONG).show();
+            }
+        }
+        //Toast.makeText(getApplicationContext(),"Face Count:" + faces.size(), Toast.LENGTH_SHORT)
+        //        .show();
+        Log.i("tttt", "Face Count:" + faces.size());
+        if (faces.size() > 0)
+        {
+            faceGet = true;
+            Canvas canvas = new Canvas(bitmap);
+            Paint paint = new Paint();
+            paint.setColor(Color.GREEN);
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeWidth(5);
+            for (int i = 0; i < faces.size(); ++i) {
+                Face face = faces.valueAt(i);
+                for (Landmark landmark : face.getLandmarks()) {
+                    int cx = (int) (landmark.getPosition().x*scale);
+                    int cy = (int) (landmark.getPosition().y*scale);
+                    canvas.drawCircle(cx, cy, 10, paint);
+                }
+                Log.i("tttt",  "Smile:" + face.getIsSmilingProbability()  +
+                        " LeftOpen:" + face.getIsLeftEyeOpenProbability() +
+                        " RightOpen:" + face.getIsRightEyeOpenProbability());
+            }
+            runOnUiThread(new newRunnable(bitmap));
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    Toast.makeText(getApplicationContext(), "face get", Toast.LENGTH_SHORT).show();
+                }
+            });
+            safeDetector.release();
+            return bitmap;
+        }
+        else{
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    Toast.makeText(getApplicationContext(), "no face detected.", Toast.LENGTH_SHORT).show();
+                }
+            });
+            safeDetector.release();
+            return bitmap;
+        }
+    }
+
+    private class newRunnable implements Runnable{
+        Bitmap bitmap;
+        newRunnable(Bitmap _bitmap)
+        {
+            bitmap = _bitmap;
+        }
+        @Override
+        public void run() {
+            Toast toast = Toast.makeText(getApplicationContext(), "----------------face----------------", Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.FILL_HORIZONTAL, 0, 0);
+            LinearLayout toastView = (LinearLayout) toast.getView();
+            ImageView image = new ImageView(getApplicationContext());
+            image.setImageBitmap(bitmap);
+            toastView.addView(image, 0);
+            toast.show();
+        }
+    }
+
+    private File GetNewestFile(String Path, String Extension)
+    {
+        try {
+            Thread.sleep(500);  //保证视频已经写入
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        File result = null;
+        File[] files =new File(Path).listFiles();
+
+        long modifiedTime = Long.MIN_VALUE;
+
+        for (int i =0; i < files.length; i++) {
+            File f = files[i];
+            //Log.i("tttt",f.getPath());
+            if (f!=null && f.isFile()) {
+                //Log.i("tttt", "optional:" + f.getPath());
+                if (f.getPath().substring(f.getPath().length() - Extension.length()).equals(Extension)) { //判断扩展名{
+                    if (f.lastModified() > modifiedTime) {
+                        result = f;
+                        modifiedTime = f.lastModified();
+                    }
+                }
+            }
+        }
+        //删除无用.mp4文件
+        for (int i = 0; i < files.length; i++) {
+            File f= files[i];
+            if (f != null) {
+                if (!f.getPath().substring(f.getPath().length() - Extension.length()).equals("png")){
+                    if (!f.getPath().equals(result.getPath()))
+                        f.delete();
+                }
+            }
+        }
+        //Log.i("tttta", "final" + result.getPath());
+        return result;
+
+    }
+
+    private void GetandSaveCurrentImage(int angle) {
+        File dcimDir = FileUtils.getMediaFolder(getApplicationContext());
+        String SavePath = dcimDir.getAbsolutePath();
+        //Log.i("tttt", "dir=" + SavePath);
+        File videoFile = GetNewestFile(SavePath, "mp4");
+        Log.i("tttt", "video:"+videoFile.getPath());
+        if (videoFile == null)
+            Log.i("tttt","got no video file.");
+        MediaMetadataRetriever media = new MediaMetadataRetriever();
+        try {
+            String s = videoFile.getPath();
+            String filepath = s.replace("mp4","png");
+            File picFile = new File(filepath);
+            boolean tt = picFile.exists();
+            //如果没有png
+            if(!picFile.exists()) {
+                //Toast.makeText(getApplicationContext(), s, Toast.LENGTH_SHORT).show();
+                //Log.i("tttt", s);
+                media.setDataSource(s);
+                Bitmap bitmap = media.getFrameAtTime();
+                bitmap = faceDetectandDraw(bitmap);
+                if (bitmap != null) {
+                    File path = new File(SavePath);
+                    if (!path.exists()) {
+                        path.mkdirs();
+                    }
+                    if (!picFile.exists()) {
+                        picFile.createNewFile();
+                    }
+                    FileOutputStream fos = null;
+                    fos = new FileOutputStream(picFile);
+                    if (null != fos) {
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 90, fos);
+                        fos.flush();
+                        fos.close();
+                    }
+                    //itmap.recycle();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 
     @Override
@@ -205,7 +407,8 @@ public class AutoControlDroneActivity
         combinedYawEnabled = true;
         acceleroEnabled = false;
         running = false;
-
+        rotatingandDetecting = false;
+        faceGet = false;
         //initRegularJoystics();
 
         view = new AutoHudViewController(this, useSoftwareRendering);
@@ -326,7 +529,6 @@ public class AutoControlDroneActivity
 //            }
 //        };
 //    }
-
     private void initGoogleTVControllers(final ControlButtons buttons)
     {
 
@@ -576,8 +778,25 @@ public class AutoControlDroneActivity
 
             public void onClick(View v)
             {
+                RecordThread thread = new RecordThread();
                 if (droneControlService != null) {
-                    droneControlService.triggerTakeOff();
+                    rotatingandDetecting = !rotatingandDetecting;
+                    if (rotatingandDetecting){
+                        droneControlService.triggerTakeOff();
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        droneControlService.moveUp((float)0.6);
+
+                        thread.start();
+                    }
+                    else {
+                        droneControlService.triggerTakeOff();
+                        thread.interrupt();
+                    }
+
                 }
             }
         });
@@ -646,7 +865,84 @@ public class AutoControlDroneActivity
             }
         });
     }
+    class RecordThread extends Thread
+    {
+        private long startTime = 0;
+        private long endTime = 0;
+        private boolean faceDetecting = true;
+        private boolean rotating =false;
+        @Override
+        public synchronized void run()
+        {
+            Log.i("tttt", "FaceDetect start.");
+            //droneControlService.turnLeft((float)0.1);
+            try {
+                Thread.sleep(6000);  //继续上升
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            droneControlService.stop();
+            try {
+                Thread.sleep(2000);  //等待稳定
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            while (rotatingandDetecting)
+            {
+                if (startTime == 0) {
+                    onRecord();
+                    startTime = System.currentTimeMillis(); //毫秒
+                    faceDetecting = true;
+                    Log.i("tttt", "Record start.");
+                }
+                endTime = System.currentTimeMillis();
+                long dt = (endTime - startTime);
 
+                if (dt > 1500 && faceDetecting) {
+                    onRecord();
+                    Log.i("tttt", "Record finish.");
+                    GetandSaveCurrentImage(ct);
+                    /*try {
+                        Thread.sleep(1000);  //保证视频已经写入
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }*/
+                    faceDetecting = false;
+                    startTime = System.currentTimeMillis();
+                    if (!faceGet) {
+                        Log.i("tttt", "Rotating start.");
+                        try {
+                            Thread.sleep(1000);  //延迟一秒旋转
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        droneControlService.turnLeft((float)0.2);
+                        rotating = true;
+                    }
+                }
+                if (dt > 3000 && !faceDetecting && !faceGet)
+                {
+                    droneControlService.stop();
+                    Log.i("tttt","rotating finish");
+                    rotating = false;
+                    startTime = 0;
+                    try {
+                        Thread.sleep(2000);  //保证旋转停止后的稳定
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            if (recording) {
+                onRecord();
+                Log.i("tttt", "Record finish.");
+            }
+            if (rotating) {
+                droneControlService.stop();
+                Log.i("tttt", "rotating finish");
+            }
+        }
+    }
     
 //    private void initVirtualJoysticks(JoystickType leftType, JoystickType rightType, boolean isLeftHanded)
 //    {
@@ -1134,7 +1430,7 @@ public class AutoControlDroneActivity
                     droneControlService.setPitch(y);
                     droneControlService.setRoll(x);
                 }
-            }
+            }Log.i("aaa","update file");
         }
     }
 
@@ -1278,8 +1574,39 @@ public class AutoControlDroneActivity
             }
         }
     }
+    private int ct = 0;
 
-    protected void onTakePhoto()
+    protected  void onTakePhoto() {
+        //faceRecording = !faceRecording;
+        /*if (faceRecording) {
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    Toast.makeText(getApplicationContext(), "RecordThread start.", Toast.LENGTH_SHORT).show();
+                }
+            });
+            RecordThread thread = new RecordThread();
+            thread.start();
+        }
+        else {
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    Toast.makeText(getApplicationContext(), "RecordThread finish.", Toast.LENGTH_SHORT).show();
+                }
+            });
+            Log.i("tttt","RecordThread finish.");
+        }*/
+
+
+        //ct += 1;
+        if (droneControlService.isMediaStorageAvailable()) {
+            view.setCameraButtonEnabled(false);
+            droneControlService.takePhoto();
+        } else {
+            onNotifyNoMediaStorageAvailable();
+        }
+    }
+
+    /*protected void onTakePhoto()
     {
         if (droneControlService.isMediaStorageAvailable()) {
             view.setCameraButtonEnabled(false);
@@ -1287,5 +1614,5 @@ public class AutoControlDroneActivity
         } else {
            onNotifyNoMediaStorageAvailable();
         }
-    }
+    }*/
 }

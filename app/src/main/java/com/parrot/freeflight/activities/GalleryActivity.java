@@ -1,11 +1,5 @@
 package com.parrot.freeflight.activities;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnErrorListener;
@@ -37,6 +31,10 @@ import com.parrot.freeflight.utils.DeviceCapabilitiesUtils;
 import com.parrot.freeflight.utils.NookUtils;
 import com.parrot.freeflight.utils.ShareUtils;
 import com.parrot.freeflight.vo.MediaVO;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * GalleryActivity allows the user to browse media files one by one with ability
@@ -90,6 +88,7 @@ public class GalleryActivity extends ParrotActivity
 
     private void initMediaTask(MediaFilter filter, final int selectedElement)
     {
+        //Log.i("aaa","update file");
         if (initMediaTask == null || (initMediaTask != null && initMediaTask.getStatus() != Status.RUNNING)) {
             initMediaTask = new GetMediaObjectsListTask(this, filter)
             {
@@ -98,6 +97,7 @@ public class GalleryActivity extends ParrotActivity
                 {
                     onMediaScanCompleted(selectedElement, result);
                 }
+
             };
 
             try {

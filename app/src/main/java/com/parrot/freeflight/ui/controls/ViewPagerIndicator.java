@@ -57,7 +57,7 @@ implements OnPageChangeListener
 		
 		radius = a.getDimension(R.styleable.ViewPagerIndicator_radius, radius);
 		gap = a.getDimension(R.styleable.ViewPagerIndicator_gap, gap);
-		pageColor = a.getColor(R.styleable.ViewPagerIndicator_color, pageColor);
+		pageColor = a.getColor(R.styleable.ViewPagerIndicator_colorr, pageColor);
 		currentPageColor = a.getColor(R.styleable.ViewPagerIndicator_activeColor, currentPageColor);
 		
 		a.recycle();
