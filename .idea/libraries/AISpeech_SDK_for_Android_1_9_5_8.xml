@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="AISpeech-SDK-for-Android-1.9.5.8">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/app/libs/AISpeech-SDK-for-Android-1.9.5.8.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

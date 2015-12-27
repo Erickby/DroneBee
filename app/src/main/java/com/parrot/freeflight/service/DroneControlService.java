@@ -288,6 +288,13 @@ LocationListener
 	}
 
 
+	public void stop(){
+		droneProxy.setControlValue(CONTROL_SET_YAW, 0);
+		droneProxy.setControlValue(CONTROL_SET_PITCH, 0);
+		droneProxy.setControlValue(CONTROL_SET_GAZ, 0);
+		droneProxy.setControlValue(CONTROL_SET_ROLL, 0);
+	}
+
 	/** 
 	 * Makes the drone to do left flip
 	 */

@@ -22,4 +22,5 @@ dependencies {
     compile files('libs/android-support-v13.jar')
     compile files('libs/com.sony.rdis.receiver-20111206.jar')
     compile files('libs/com.sony.rdis.receiver.utility-20111206.jar')
+    compile files('libs/AISpeech-SDK-for-Android-1.9.5.8.jar')
 }

@@ -503,7 +503,12 @@ public class VoiceHudViewController
 		btnRecord.setEnabled(enabled);
 //		txtRecord.setEnabled(enabled);
 	}
-	
+
+	public void setVoiceButtonEnabled(boolean enabled)
+	{
+		btnVoice.setEnabled(enabled);
+//		txtRecord.setEnabled(enabled);
+	}
 	
 	public void setCameraButtonEnabled(boolean enabled)
 	{

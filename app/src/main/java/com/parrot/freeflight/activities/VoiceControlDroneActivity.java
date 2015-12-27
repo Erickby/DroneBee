@@ -30,7 +30,18 @@ import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.aispeech.AIError;
+import com.aispeech.AIResult;
+import com.aispeech.IMergeRule;
+import com.aispeech.common.Util;
+import com.aispeech.export.engines.AILocalGrammarEngine;
+import com.aispeech.export.engines.AIMixASREngine;
+import com.aispeech.export.listeners.AIASRListener;
+import com.aispeech.export.listeners.AILocalGrammarListener;
 import com.parrot.freeflight.FreeFlightApplication;
 import com.parrot.freeflight.R;
 import com.parrot.freeflight.activities.base.ParrotActivity;
@@ -70,8 +81,16 @@ import com.parrot.freeflight.ui.VoiceHudViewController;
 import com.parrot.freeflight.ui.SettingsDialogDelegate;
 import com.parrot.freeflight.utils.NookUtils;
 import com.parrot.freeflight.utils.SystemUtils;
+import com.parrot.util.NetworkUtil;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -222,6 +241,8 @@ public class VoiceControlDroneActivity
         
 //        view.setCameraButtonEnabled(false);
         view.setRecordButtonEnabled(false);
+
+
     }
     
     private void applyHandDependendTVControllers()
@@ -543,6 +564,235 @@ public class VoiceControlDroneActivity
         return result;
     }
 
+    /**
+     * 设置识别按钮的状态
+     *
+     * @param state
+     *            使能状态
+     * @param text
+     *            按钮文本
+     */
+    private String action;
+    AIMixASREngine mAsrEngine;
+    private void setAsrBtnState(final boolean state,final boolean b) {
+        runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+                view.setVoiceButtonEnabled(state);
+                if (b)
+                {
+                    lock=0;
+                }
+                else
+                {
+                    lock=1;
+                }
+            }
+        });
+    }
+
+    private void showInfo(final String str) {
+        runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+                Toast.makeText(VoiceControlDroneActivity.this,str,Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    /**
+     * 本地识别引擎回调接口，用以接收相关事件
+     */
+    public class AIASRListenerImpl implements AIASRListener {
+
+        @Override
+        public void onBeginningOfSpeech() {
+            showInfo("检测到说话");
+
+        }
+
+        @Override
+        public void onEndOfSpeech() {
+            showInfo("检测到语音停止，开始识别...");
+        }
+
+        @Override
+        public void onReadyForSpeech() {
+            showInfo("请说话...");
+        }
+
+        @Override
+        public void onRmsChanged(float rmsdB) {
+
+        }
+
+        @Override
+        public void onError(AIError error) {
+            showInfo("识别发生错误");
+            setAsrBtnState(true,true);
+        }
+
+        @Override
+        public void onResults(AIResult results) {
+            Log.i(TAG, results.getResultObject().toString());
+            try {
+                JSONObject jsonObject=new JSONObject(results.getResultObject().toString());
+                JSONObject result=jsonObject.getJSONObject("result");
+                action=result.getJSONObject("post").getJSONObject("sem").get("action").toString();
+                showInfo(action);
+                if (droneControlService!=null)
+                {
+                    switch (action)
+                    {
+                        case "takeoff":
+                            droneControlService.triggerTakeOff();
+                            break;
+                        case "landing":
+                            droneControlService.triggerTakeOff();
+                            break;
+                        case "takephoto":
+                            droneControlService.takePhoto();
+                            break;
+                        case "record":
+                            droneControlService.record();
+                            break;
+                        case "endrecord":
+                            droneControlService.record();
+                            break;
+                        case "emergency":
+                            droneControlService.triggerEmergency();
+                            break;
+                        case "moveforward":
+                            droneControlService.moveForward(2);
+                            break;
+                        case "movebackward":
+                            droneControlService.moveBackward(2);
+                            break;
+                        case "moveup":
+                            droneControlService.moveUp(2);
+                            break;
+                        case "movedown":
+                            droneControlService.moveDown(2);
+                            break;
+                        case "moveleft":
+                            droneControlService.moveLeft(2);
+                            break;
+                        case "moveright":
+                            droneControlService.moveRight(2);
+                            break;
+                        case "turnleft":
+                            droneControlService.turnLeft(2);
+                            break;
+                        case "turnright":
+                            droneControlService.turnRight(2);
+                            break;
+                        case "switchcamera":
+                            droneControlService.switchCamera();
+                            break;
+                        case "stop":
+                            droneControlService.stop();
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            setAsrBtnState(true,true);
+        }
+
+        @Override
+        public void onInit(int status) {
+            if (status == 0) {
+                Log.i(TAG, "end of init asr engine");
+                showInfo("本地识别引擎加载成功");
+                view.setVoiceButtonEnabled(true);
+                setAsrBtnState(true,true);
+                if (NetworkUtil.isWifiConnected(VoiceControlDroneActivity.this)) {
+                    if (mAsrEngine != null) {
+                        mAsrEngine.setNetWorkState("WIFI");
+                    }
+                }
+            } else {
+                showInfo("本地识别引擎加载失败");
+            }
+        }
+
+        @Override
+        public void onRecorderReleased() {
+            // showInfo("检测到录音机停止");
+        }
+    }
+
+    private void initAsrEngine() {
+        if (mAsrEngine != null) {
+            mAsrEngine.destroy();
+        }
+        Log.i(TAG, "asr create");
+        mAsrEngine = AIMixASREngine.createInstance();
+        mAsrEngine.setResBin("ebnfr.aifar.0.0.1.bin");
+        mAsrEngine.setNetBin(AILocalGrammarEngine.OUTPUT_NAME, true);
+
+        //mAsrEngine.setWaitCloudTimeout(3000);
+        mAsrEngine.setVadResource("vad.aihome.v0.3_20150901.bin");
+        if (getExternalCacheDir() != null) {
+            mAsrEngine.setTmpDir(getExternalCacheDir().getAbsolutePath());
+            mAsrEngine.setUploadEnable(true);
+            mAsrEngine.setUploadInterval(1000);
+        }
+        mAsrEngine.setServer("ws://s-test.api.aispeech.com:10000");
+        mAsrEngine.setRes("aihome");
+        mAsrEngine.setUseXbnfRec(true);
+        mAsrEngine.setUsePinyin(true);
+        mAsrEngine.setUseForceout(false);
+        mAsrEngine.setAthThreshold(0.4f);//设置本地置信度阀值
+        mAsrEngine.setIsRelyOnLocalConf(true);//是否开启依据本地置信度优先输出,如需添加例外
+        mAsrEngine.setLocalBetterDomains(new String[] { "phone", "remind"});//设置本地擅长的领域范围
+        mAsrEngine.setWaitCloudTimeout(3000);
+        mAsrEngine.setPauseTime(1000);
+        mAsrEngine.setUseConf(true);
+        mAsrEngine.setNoSpeechTimeOut(0);
+        mAsrEngine.setDeviceId(Util.getIMEI(this));
+        // 自行设置合并规则:
+        // 1. 如果无云端结果,则直接返回本地结果
+        // 2. 如果有云端结果,当本地结果置信度大于阈值时,返回本地结果,否则返回云端结果
+        mAsrEngine.setMergeRule(new IMergeRule() {
+
+            @Override
+            public AIResult mergeResult(AIResult localResult, AIResult cloudResult) {
+
+                AIResult result = null;
+                try {
+                    if (cloudResult == null) {
+                        // 为结果增加标记,以标示来源于云端还是本地
+                        JSONObject localJsonObject = new JSONObject(localResult.getResultObject()
+                                .toString());
+                        localJsonObject.put("src", "native");
+
+                        localResult.setResultObject(localJsonObject);
+                        result = localResult;
+                    } else {
+                        JSONObject cloudJsonObject = new JSONObject(cloudResult.getResultObject()
+                                .toString());
+                        cloudJsonObject.put("src", "cloud");
+                        cloudResult.setResultObject(cloudJsonObject);
+                        result = cloudResult;
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                return result;
+
+            }
+        });
+        mAsrEngine.init(this, new AIASRListenerImpl(), AppKey.APPKEY, AppKey.SECRETKEY);
+        mAsrEngine.setUseCloud(false);//该方法必须在init之后
+    }
+
+    private int lock=0;
+
     private void initListeners()
     {
 //        view.setSettingsButtonClickListener(new OnClickListener()
@@ -552,13 +802,25 @@ public class VoiceControlDroneActivity
 //                showSettingsDialog();
 //            }
 //        });
-
+        initAsrEngine();
 
         view.setVoiceButtonCLickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
+                if (droneControlService != null) {
+                    action="undefine";
+                    if (lock==0) {
+                        if (mAsrEngine != null) {
+                            setAsrBtnState(true,false);
+                            mAsrEngine.start();
+                        }
+                    } else {
+                        if (mAsrEngine != null) {
+                            setAsrBtnState(true,true);
+                            mAsrEngine.stopRecording();
+                        }
+                    }
+                }
             }
         });
 

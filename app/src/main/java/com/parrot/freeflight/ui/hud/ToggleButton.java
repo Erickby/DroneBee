@@ -27,7 +27,7 @@ public class ToggleButton extends Button
 		spriteGlow = new GLSprite(resources, glowBitmapId);
 		spriteCheckedNormal = new GLSprite(resources, checkedNormalBitmapId);
 		spriteCheckedPressed = new GLSprite(resources, checkedPressedBitmapId);
-		
+
 		lightAlpha = 1.0f;
 		alphaCoef = -1;
 		checked = false;

@@ -22,6 +22,7 @@ public class FreeFlightApplication
 		System.loadLibrary("avformat");
 		System.loadLibrary("avdevice");
 		System.loadLibrary("adfreeflight");
+		System.loadLibrary("aiengine");
 	}
 	
 	@SuppressLint("NewApi")

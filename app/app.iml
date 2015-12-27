@@ -89,6 +89,7 @@
     <orderEntry type="jdk" jdkName="Android API 22 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="com.sony.rdis.receiver.utility-20111206" level="project" />
+    <orderEntry type="library" exported="" name="AISpeech-SDK-for-Android-1.9.5.8" level="project" />
     <orderEntry type="library" exported="" name="com.sony.rdis.receiver-20111206" level="project" />
     <orderEntry type="library" exported="" name="android-support-v13" level="project" />
   </component>
