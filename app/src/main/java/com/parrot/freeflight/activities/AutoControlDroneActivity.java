@@ -17,6 +17,8 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
+import android.graphics.PointF;
 import android.media.AudioManager;
 import android.media.MediaMetadataRetriever;
 import android.media.SoundPool;
@@ -227,8 +229,8 @@ public class AutoControlDroneActivity
         Log.i("tttt", "Face Count:" + faces.size());
         if (faces.size() > 0)
         {
-            //faceGet = true;
-            String faceInfo = null;
+            faceGet = true;
+            String faceInfo = "";
             Canvas canvas = new Canvas(bitmap);
             Paint paint = new Paint();
             paint.setColor(Color.GREEN);
@@ -240,26 +242,33 @@ public class AutoControlDroneActivity
             int yMax = Integer.MIN_VALUE;
             int yMin = Integer.MAX_VALUE;
             float smileMax = Float.MIN_VALUE;
+            float faceWidth = 0;
 
             for (int i = 0; i < faces.size(); ++i) {
                 Face face = faces.valueAt(i);
+
                 float smileVal = face.getIsSmilingProbability();
                 for (Landmark landmark : face.getLandmarks()) {
                     int cx = (int) (landmark.getPosition().x*scale);
                     int cy = (int) (landmark.getPosition().y*scale);
                     canvas.drawCircle(cx, cy, 10, paint);
-
+                    Log.i("ttland", cx + "");
                     if (smileVal > smileMax) {
                         xMax = (cx>xMax)? cx:xMax;
                         xMin = (cx<xMin)? cx:xMin;
                         yMax = (cy>yMax)? cy:yMax;
                         yMin = (cy<xMin)? cy:yMin;
+                        smileMax = smileVal;
+                        faceWidth = face.getWidth();
+                        PointF p = face.getPosition();
+                        Log.i("ttxy", p.x + " " + p.y);
                     }
                 }
                 Log.i("tttt",  "Smile:" + face.getIsSmilingProbability()  +
                         " LeftOpen:" + face.getIsLeftEyeOpenProbability() +
                         " RightOpen:" + face.getIsRightEyeOpenProbability());
-                faceInfo += faceInfo + "face" + i + ":" + face.getIsSmilingProbability() + "\n";
+                Log.i("ttwi",  "width:" + faceWidth);
+                faceInfo += "face" + i +" Smile: " + face.getIsSmilingProbability() + "\n";
             }
 
 
@@ -267,12 +276,14 @@ public class AutoControlDroneActivity
             if (smileMax > 0.08){
                 //move = 1;
                 //int x = (xMax+)
-                if ((xMax - xMin)<300) {
+                if ((faceWidth)<300) {
+                    Log.i("tttt",  "forward");
                     moveVal = 1;
                     rotateVal = 0;
                 }
             }
             else {
+                Log.i("ttbk",  "backward");
                 moveVal = -1;
             }
             runOnUiThread(new newRunnable(bitmap,faceInfo));
@@ -907,8 +918,12 @@ public class AutoControlDroneActivity
 
     private void Move(float dis)
     {
-        int time = (int)dis*1000;
-        float speed = (float)0.2;
+        if(dis == 0)
+            return;
+
+        int time = (int)dis*1500;
+        Log.i("tt","into move and speed is: "+time);
+        float speed = (float)0.8;
         if (time >=0)
             droneControlService.moveForward(speed);
         else
@@ -922,6 +937,8 @@ public class AutoControlDroneActivity
     }
     private void Rotate(int angle)
     {
+        if(angle == 0)
+            return;
         int time = angle/90*3000;
         float speed = (float)0.2;
         if (time >= 0)
@@ -948,7 +965,7 @@ public class AutoControlDroneActivity
             Log.i("tttt", "FaceDetect start.");
             //droneControlService.turnLeft((float)0.1);
             try {
-                Thread.sleep(4500);  //继续上升
+                Thread.sleep(5000);  //继续上升
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -959,6 +976,14 @@ public class AutoControlDroneActivity
                 e.printStackTrace();
             }
             /**/
+            droneControlService.doLeftFlip();
+            Log.i("ttmv","first");
+            try {
+                Thread.sleep(50000);  //等待稳定
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            Log.i("ttmv","second");
             while (rotatingandDetecting)
             {
                 droneControlService.stop();
@@ -977,7 +1002,11 @@ public class AutoControlDroneActivity
                 }
                 Log.i("tttt", "Record finish.");
                 GetandSaveCurrentImage();
-
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 if (faceGet)
                 {
                     Rotate(rotateVal);
@@ -997,6 +1026,7 @@ public class AutoControlDroneActivity
 
                     rotateVal = 0;
                     moveVal = 0;
+                    faceGet = false;
                 }
 
                 rotating = true;
@@ -1006,51 +1036,6 @@ public class AutoControlDroneActivity
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-//                if (startTime == 0) {
-//                    onRecord();
-//                    startTime = System.currentTimeMillis(); //毫秒
-//                    faceDetecting = true;
-//                    Log.i("tttt", "Record start.");
-//                }
-//                endTime = System.currentTimeMillis();
-//                long dt = (endTime - startTime);
-//
-//                if (dt > 1500 && faceDetecting) {
-//                    onRecord();
-//                    Log.i("tttt", "Record finish.");
-//                    GetandSaveCurrentImage();
-//                    /*try {
-//                        Thread.sleep(1000);  //保证视频已经写入
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }*/
-//                    faceDetecting = false;
-//                    startTime = System.currentTimeMillis();
-//                    if (faceGet)
-//                        break;
-//                    Log.i("tttt", "Rotating start.");
-//                    try {
-//                        Thread.sleep(1000);  //延迟一秒旋转
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                    droneControlService.turnLeft((float)0.2);
-//
-//                    rotating = true;
-//
-//                }
-//                if (dt > 3000 && !faceDetecting)
-//                {
-//                    droneControlService.stop();
-//                    Log.i("tttt","rotating finish");
-//                    rotating = false;
-//                    startTime = 0;
-//                    try {
-//                        Thread.sleep(2000);  //保证旋转停止后的稳定
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
             }
             droneControlService.stop();
             if (recording) {
@@ -1063,52 +1048,6 @@ public class AutoControlDroneActivity
             }
         }
     }
-    
-//    private void initVirtualJoysticks(JoystickType leftType, JoystickType rightType, boolean isLeftHanded)
-//    {
-//        JoystickBase joystickLeft = (!isLeftHanded ? view.getJoystickLeft() : view.getJoystickRight());
-//        JoystickBase joystickRight = (!isLeftHanded ? view.getJoystickRight() : view.getJoystickLeft());
-//
-//        ApplicationSettings settings = getSettings();
-//
-//        if (leftType == JoystickType.ANALOGUE) {
-//            if (joystickLeft == null || !(joystickLeft instanceof AnalogueJoystick) || joystickLeft.isAbsoluteControl() != settings.isAbsoluteControlEnabled()) {
-//                joystickLeft = JoystickFactory.createAnalogueJoystick(this, settings.isAbsoluteControlEnabled(), rollPitchListener);
-//            } else {
-//                joystickLeft.setOnAnalogueChangedListener(rollPitchListener);
-//                joystickRight.setAbsolute(settings.isAbsoluteControlEnabled());
-//            }
-//        } else if (leftType == JoystickType.ACCELERO) {
-//            if (joystickLeft == null || !(joystickLeft instanceof AcceleroJoystick) || joystickLeft.isAbsoluteControl() != settings.isAbsoluteControlEnabled()) {
-//                joystickLeft = JoystickFactory.createAcceleroJoystick(this, settings.isAbsoluteControlEnabled(), rollPitchListener);
-//            } else {
-//                joystickLeft.setOnAnalogueChangedListener(rollPitchListener);
-//                joystickRight.setAbsolute(settings.isAbsoluteControlEnabled());
-//            }
-//        }
-//
-//        if (rightType == JoystickType.ANALOGUE) {
-//            if (joystickRight == null || !(joystickRight instanceof AnalogueJoystick) || joystickRight.isAbsoluteControl() != settings.isAbsoluteControlEnabled()) {
-//                joystickRight = JoystickFactory.createAnalogueJoystick(this, false, gazYawListener);
-//            } else {
-//                joystickRight.setOnAnalogueChangedListener(gazYawListener);
-//                joystickRight.setAbsolute(false);
-//            }
-//        } else if (rightType == JoystickType.ACCELERO) {
-//            if (joystickRight == null || !(joystickRight instanceof AcceleroJoystick) || joystickRight.isAbsoluteControl() != settings.isAbsoluteControlEnabled()) {
-//                joystickRight = JoystickFactory.createAcceleroJoystick(this, false, gazYawListener);
-//            } else {
-//                joystickRight.setOnAnalogueChangedListener(gazYawListener);
-//                joystickRight.setAbsolute(false);
-//            }
-//        }
-//
-////        if (!isLeftHanded) {
-////            view.setJoysticks(joystickLeft, joystickRight);
-////        } else {
-////            view.setJoysticks(joystickRight, joystickLeft);
-////        }
-//    }
 
     @Override
     protected void onDestroy()
