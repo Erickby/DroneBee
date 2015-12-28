@@ -161,7 +161,8 @@ public class AutoControlDroneActivity
 
     private boolean rotatingandDetecting;
     private boolean faceGet;
-
+    float moveVal;
+    int rotateVal;
     private ServiceConnection mConnection = new ServiceConnection()
     {
 
@@ -226,29 +227,62 @@ public class AutoControlDroneActivity
         Log.i("tttt", "Face Count:" + faces.size());
         if (faces.size() > 0)
         {
-            faceGet = true;
+            //faceGet = true;
+            String faceInfo = null;
             Canvas canvas = new Canvas(bitmap);
             Paint paint = new Paint();
             paint.setColor(Color.GREEN);
             paint.setStyle(Paint.Style.STROKE);
             paint.setStrokeWidth(5);
+
+            int xMax = Integer.MIN_VALUE;
+            int xMin = Integer.MAX_VALUE;
+            int yMax = Integer.MIN_VALUE;
+            int yMin = Integer.MAX_VALUE;
+            float smileMax = Float.MIN_VALUE;
+
             for (int i = 0; i < faces.size(); ++i) {
                 Face face = faces.valueAt(i);
+                float smileVal = face.getIsSmilingProbability();
                 for (Landmark landmark : face.getLandmarks()) {
                     int cx = (int) (landmark.getPosition().x*scale);
                     int cy = (int) (landmark.getPosition().y*scale);
                     canvas.drawCircle(cx, cy, 10, paint);
+
+                    if (smileVal > smileMax) {
+                        xMax = (cx>xMax)? cx:xMax;
+                        xMin = (cx<xMin)? cx:xMin;
+                        yMax = (cy>yMax)? cy:yMax;
+                        yMin = (cy<xMin)? cy:yMin;
+                    }
                 }
                 Log.i("tttt",  "Smile:" + face.getIsSmilingProbability()  +
                         " LeftOpen:" + face.getIsLeftEyeOpenProbability() +
                         " RightOpen:" + face.getIsRightEyeOpenProbability());
+                faceInfo += faceInfo + "face" + i + ":" + face.getIsSmilingProbability() + "\n";
             }
-            runOnUiThread(new newRunnable(bitmap));
+
+
+
+            if (smileMax > 0.08){
+                //move = 1;
+                //int x = (xMax+)
+                if ((xMax - xMin)<300) {
+                    moveVal = 1;
+                    rotateVal = 0;
+                }
+            }
+            else {
+                moveVal = -1;
+            }
+            runOnUiThread(new newRunnable(bitmap,faceInfo));
             runOnUiThread(new Runnable() {
                 public void run() {
                     Toast.makeText(getApplicationContext(), "face get", Toast.LENGTH_SHORT).show();
                 }
             });
+
+
             safeDetector.release();
             return bitmap;
         }
@@ -259,19 +293,22 @@ public class AutoControlDroneActivity
                 }
             });
             safeDetector.release();
-            return bitmap;
+            return null;
         }
     }
 
     private class newRunnable implements Runnable{
         Bitmap bitmap;
-        newRunnable(Bitmap _bitmap)
+        String faceInfo;
+        newRunnable(Bitmap _bitmap, String _faceInfo)
         {
             bitmap = _bitmap;
+            faceInfo = _faceInfo;
         }
         @Override
         public void run() {
-            Toast toast = Toast.makeText(getApplicationContext(), "----------------face----------------", Toast.LENGTH_LONG);
+
+            Toast toast = Toast.makeText(getApplicationContext(), faceInfo, Toast.LENGTH_LONG);
             toast.setGravity(Gravity.FILL_HORIZONTAL, 0, 0);
             LinearLayout toastView = (LinearLayout) toast.getView();
             ImageView image = new ImageView(getApplicationContext());
@@ -321,7 +358,7 @@ public class AutoControlDroneActivity
 
     }
 
-    private void GetandSaveCurrentImage(int angle) {
+    private void GetandSaveCurrentImage() {
         File dcimDir = FileUtils.getMediaFolder(getApplicationContext());
         String SavePath = dcimDir.getAbsolutePath();
         //Log.i("tttt", "dir=" + SavePath);
@@ -409,6 +446,8 @@ public class AutoControlDroneActivity
         running = false;
         rotatingandDetecting = false;
         faceGet = false;
+        moveVal = 0;
+        rotateVal = 0;
         //initRegularJoystics();
 
         view = new AutoHudViewController(this, useSoftwareRendering);
@@ -865,11 +904,43 @@ public class AutoControlDroneActivity
             }
         });
     }
+
+    private void Move(float dis)
+    {
+        int time = (int)dis*1000;
+        float speed = (float)0.2;
+        if (time >=0)
+            droneControlService.moveForward(speed);
+        else
+            droneControlService.moveBackward(speed);
+        try {
+            Thread.sleep(java.lang.Math.abs(time));  //保持稳定
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        droneControlService.stop();
+    }
+    private void Rotate(int angle)
+    {
+        int time = angle/90*3000;
+        float speed = (float)0.2;
+        if (time >= 0)
+            droneControlService.turnLeft(speed);
+        else
+            droneControlService.turnRight(speed);
+        try {
+            Thread.sleep(java.lang.Math.abs(time));  //保持稳定
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        droneControlService.stop();
+    }
+
     class RecordThread extends Thread
     {
-        private long startTime = 0;
-        private long endTime = 0;
-        private boolean faceDetecting = true;
+//        private long startTime = 0;
+//        private long endTime = 0;
+//        private boolean faceDetecting = true;
         private boolean rotating =false;
         @Override
         public synchronized void run()
@@ -877,7 +948,7 @@ public class AutoControlDroneActivity
             Log.i("tttt", "FaceDetect start.");
             //droneControlService.turnLeft((float)0.1);
             try {
-                Thread.sleep(6000);  //继续上升
+                Thread.sleep(4500);  //继续上升
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -887,52 +958,101 @@ public class AutoControlDroneActivity
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+            /**/
             while (rotatingandDetecting)
             {
-                if (startTime == 0) {
-                    onRecord();
-                    startTime = System.currentTimeMillis(); //毫秒
-                    faceDetecting = true;
-                    Log.i("tttt", "Record start.");
+                droneControlService.stop();
+                rotating = false;
+                onRecord();
+                try {
+                    Thread.sleep(1500);  //等待稳定
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-                endTime = System.currentTimeMillis();
-                long dt = (endTime - startTime);
+                onRecord();
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                Log.i("tttt", "Record finish.");
+                GetandSaveCurrentImage();
 
-                if (dt > 1500 && faceDetecting) {
-                    onRecord();
-                    Log.i("tttt", "Record finish.");
-                    GetandSaveCurrentImage(ct);
-                    /*try {
-                        Thread.sleep(1000);  //保证视频已经写入
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }*/
-                    faceDetecting = false;
-                    startTime = System.currentTimeMillis();
-                    if (!faceGet) {
-                        Log.i("tttt", "Rotating start.");
-                        try {
-                            Thread.sleep(1000);  //延迟一秒旋转
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        droneControlService.turnLeft((float)0.2);
-                        rotating = true;
-                    }
-                }
-                if (dt > 3000 && !faceDetecting && !faceGet)
+                if (faceGet)
                 {
-                    droneControlService.stop();
-                    Log.i("tttt","rotating finish");
-                    rotating = false;
-                    startTime = 0;
+                    Rotate(rotateVal);
                     try {
-                        Thread.sleep(2000);  //保证旋转停止后的稳定
+                        Thread.sleep(1000);  //等待稳定
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+                    Move(moveVal);
+                    GetandSaveCurrentImage();
+
+                    try {
+                        Thread.sleep(3000);  //等待稳定
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    rotateVal = 0;
+                    moveVal = 0;
                 }
+
+                rotating = true;
+                droneControlService.turnLeft((float)0.2);
+                try {
+                    Thread.sleep(3000);  //等待稳定
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+//                if (startTime == 0) {
+//                    onRecord();
+//                    startTime = System.currentTimeMillis(); //毫秒
+//                    faceDetecting = true;
+//                    Log.i("tttt", "Record start.");
+//                }
+//                endTime = System.currentTimeMillis();
+//                long dt = (endTime - startTime);
+//
+//                if (dt > 1500 && faceDetecting) {
+//                    onRecord();
+//                    Log.i("tttt", "Record finish.");
+//                    GetandSaveCurrentImage();
+//                    /*try {
+//                        Thread.sleep(1000);  //保证视频已经写入
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }*/
+//                    faceDetecting = false;
+//                    startTime = System.currentTimeMillis();
+//                    if (faceGet)
+//                        break;
+//                    Log.i("tttt", "Rotating start.");
+//                    try {
+//                        Thread.sleep(1000);  //延迟一秒旋转
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                    droneControlService.turnLeft((float)0.2);
+//
+//                    rotating = true;
+//
+//                }
+//                if (dt > 3000 && !faceDetecting)
+//                {
+//                    droneControlService.stop();
+//                    Log.i("tttt","rotating finish");
+//                    rotating = false;
+//                    startTime = 0;
+//                    try {
+//                        Thread.sleep(2000);  //保证旋转停止后的稳定
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
             }
+            droneControlService.stop();
             if (recording) {
                 onRecord();
                 Log.i("tttt", "Record finish.");
@@ -1574,7 +1694,7 @@ public class AutoControlDroneActivity
             }
         }
     }
-    private int ct = 0;
+    //private int ct = 0;
 
     protected  void onTakePhoto() {
         //faceRecording = !faceRecording;
