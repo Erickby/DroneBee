@@ -976,14 +976,14 @@ public class AutoControlDroneActivity
                 e.printStackTrace();
             }
             /**/
-            droneControlService.doLeftFlip();
-            Log.i("ttmv","first");
-            try {
-                Thread.sleep(50000);  //等待稳定
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            Log.i("ttmv","second");
+            //droneControlService.doLeftFlip();
+            //Log.i("ttmv","first");
+//            try {
+//                Thread.sleep(50000);  //等待稳定
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//            Log.i("ttmv","second");
             while (rotatingandDetecting)
             {
                 droneControlService.stop();
