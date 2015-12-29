@@ -233,6 +233,7 @@ public class AutoControlDroneActivity
             String faceInfo = "";
             Canvas canvas = new Canvas(bitmap);
             Paint paint = new Paint();
+            paint.setTextSize(20);
             paint.setColor(Color.GREEN);
             paint.setStyle(Paint.Style.STROKE);
             paint.setStrokeWidth(5);
@@ -243,6 +244,7 @@ public class AutoControlDroneActivity
             int yMin = Integer.MAX_VALUE;
             float smileMax = Float.MIN_VALUE;
             float faceWidth = 0;
+            float pos = 0;
 
             for (int i = 0; i < faces.size(); ++i) {
                 Face face = faces.valueAt(i);
@@ -252,7 +254,7 @@ public class AutoControlDroneActivity
                     int cx = (int) (landmark.getPosition().x*scale);
                     int cy = (int) (landmark.getPosition().y*scale);
                     canvas.drawCircle(cx, cy, 10, paint);
-                    Log.i("ttland", cx + "");
+                    //Log.i("ttland", cx + "");
                     if (smileVal > smileMax) {
                         xMax = (cx>xMax)? cx:xMax;
                         xMin = (cx<xMin)? cx:xMin;
@@ -262,13 +264,15 @@ public class AutoControlDroneActivity
                         faceWidth = face.getWidth();
                         PointF p = face.getPosition();
                         Log.i("ttxy", p.x + " " + p.y);
+                        pos = p.x;
                     }
                 }
+                canvas.drawText("face "+i,(xMax+xMin)/2,yMin,paint);
                 Log.i("tttt",  "Smile:" + face.getIsSmilingProbability()  +
                         " LeftOpen:" + face.getIsLeftEyeOpenProbability() +
                         " RightOpen:" + face.getIsRightEyeOpenProbability());
-                Log.i("ttwi",  "width:" + faceWidth);
-                faceInfo += "face" + i +" Smile: " + face.getIsSmilingProbability() + "\n";
+                //Log.i("ttwi",  "width:" + faceWidth);
+                faceInfo += "face " + i +" Smile: " + face.getIsSmilingProbability() + "\n";
             }
 
 
@@ -276,15 +280,34 @@ public class AutoControlDroneActivity
             if (smileMax > 0.08){
                 //move = 1;
                 //int x = (xMax+)
-                if ((faceWidth)<300) {
+
                     Log.i("tttt",  "forward");
-                    moveVal = 1;
-                    rotateVal = 0;
+                if (pos<480) {
+                //    moveVal = 1;
+                    rotateVal = 23;
                 }
+                else if(pos>800){
+                    rotateVal = -23;
+                }
+                else
+                    rotateVal = 0;
             }
-            else {
+            else if(smileMax < 0.05){
                 Log.i("ttbk",  "backward");
-                moveVal = -1;
+                if (pos<480) {
+                    //    moveVal = 1;
+                    rotateVal = -23;
+                }
+                else if(pos>800){
+                    rotateVal = 23;
+                }
+                else
+                    rotateVal = 0;
+            }
+            else
+            {
+                Log.i("ttbk","no emotion");
+                rotateVal = 0;
             }
             runOnUiThread(new newRunnable(bitmap,faceInfo));
             runOnUiThread(new Runnable() {
@@ -374,7 +397,7 @@ public class AutoControlDroneActivity
         String SavePath = dcimDir.getAbsolutePath();
         //Log.i("tttt", "dir=" + SavePath);
         File videoFile = GetNewestFile(SavePath, "mp4");
-        Log.i("tttt", "video:"+videoFile.getPath());
+        //Log.i("tttt", "video:"+videoFile.getPath());
         if (videoFile == null)
             Log.i("tttt","got no video file.");
         MediaMetadataRetriever media = new MediaMetadataRetriever();
@@ -832,18 +855,18 @@ public class AutoControlDroneActivity
                 if (droneControlService != null) {
                     rotatingandDetecting = !rotatingandDetecting;
                     if (rotatingandDetecting){
-                        droneControlService.triggerTakeOff();
+                        //droneControlService.triggerTakeOff();
                         try {
                             Thread.sleep(1000);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        droneControlService.moveUp((float)0.6);
+                        //droneControlService.moveUp((float)0.6);
 
                         thread.start();
                     }
                     else {
-                        droneControlService.triggerTakeOff();
+                        //droneControlService.triggerTakeOff();
                         thread.interrupt();
                     }
 
@@ -916,7 +939,7 @@ public class AutoControlDroneActivity
         });
     }
 
-    private void Move(float dis)
+    /*private void Move(float dis)
     {
         if(dis == 0)
             return;
@@ -925,27 +948,32 @@ public class AutoControlDroneActivity
         Log.i("tt","into move and speed is: "+time);
         float speed = (float)0.8;
         if (time >=0)
-            droneControlService.moveForward(speed);
+            //droneControlService.moveForward(speed);
         else
-            droneControlService.moveBackward(speed);
+            //droneControlService.moveBackward(speed);
         try {
             Thread.sleep(java.lang.Math.abs(time));  //保持稳定
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         droneControlService.stop();
-    }
+    }*/
     private void Rotate(int angle)
     {
         if(angle == 0)
             return;
-        int time = angle/90*3000;
+        int time = angle*3000/90;
         float speed = (float)0.2;
-        if (time >= 0)
-            droneControlService.turnLeft(speed);
-        else
-            droneControlService.turnRight(speed);
+        if (time >= 0){
+            Log.i("ttt","turnleft" + angle);
+        }
+            //droneControlService.turnLeft(speed);
+        else {
+            Log.i("ttt","turnright" + (-angle));
+        }
+            //droneControlService.turnRight(speed);
         try {
+            Log.i("ttime", "" + time);
             Thread.sleep(java.lang.Math.abs(time));  //保持稳定
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -969,21 +997,15 @@ public class AutoControlDroneActivity
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            droneControlService.stop();
+            //droneControlService.stop();
             try {
                 Thread.sleep(2000);  //等待稳定
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
             /**/
-            //droneControlService.doLeftFlip();
-            //Log.i("ttmv","first");
-//            try {
-//                Thread.sleep(50000);  //等待稳定
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//            Log.i("ttmv","second");
+//
+            //droneControlService.stop();
             while (rotatingandDetecting)
             {
                 droneControlService.stop();
@@ -1009,14 +1031,15 @@ public class AutoControlDroneActivity
                 }
                 if (faceGet)
                 {
+                    Log.i("ttt","I will rotate "+rotateVal);
                     Rotate(rotateVal);
                     try {
                         Thread.sleep(1000);  //等待稳定
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    Move(moveVal);
-                    GetandSaveCurrentImage();
+                    //Move(moveVal);
+                    //GetandSaveCurrentImage();
 
                     try {
                         Thread.sleep(3000);  //等待稳定
@@ -1030,7 +1053,7 @@ public class AutoControlDroneActivity
                 }
 
                 rotating = true;
-                droneControlService.turnLeft((float)0.2);
+                //droneControlService.turnLeft((float)0.2);
                 try {
                     Thread.sleep(3000);  //等待稳定
                 } catch (InterruptedException e) {
