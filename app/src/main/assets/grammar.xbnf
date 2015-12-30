@@ -1,7 +1,7 @@
 $takeoff=(起飞|飞起来[吧])/k="action",v="takeoff"/;
 $landing=(降落)/k="action",v="landing"/;
 $emergency=(紧急|危险|迫降)/k="action",v="emergency"/;
-$takephoto=(拍照|茄子|张士文笑一个)/k="action",v="takephoto"/;
+$takephoto=(拍照|茄子|老师笑一个)/k="action",v="takephoto"/;
 $record=(录像|录段视频[吧]|结束录像)/k="action",v="record"/;
 $moveforward=(往前飞|前进)/k="action",v="moveforward"/;
 $movebackward=(往后飞|后退)/k="action",v="movebackward"/;

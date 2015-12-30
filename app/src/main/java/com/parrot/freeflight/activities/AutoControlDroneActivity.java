@@ -280,13 +280,13 @@ public class AutoControlDroneActivity
 
 
 
-            if (smileMax > 0.08){
+            if (smileMax > 0.3){
                 Log.i("tttt",  "forward");
                 if (pos<480) {
-                    rotateVal = 23;
+                    rotateVal = 60;
                 }
                 else if(pos>800){
-                    rotateVal = -23;
+                    rotateVal = -60;
                 }
                 else
                     rotateVal = 0;
@@ -294,17 +294,17 @@ public class AutoControlDroneActivity
                     moveVal = 2;
                 }
             }
-            else if(smileMax < 0.05){
+            else if(smileMax < 0.2){
                 Log.i("ttbk",  "backward");
                 if (pos<480) {
                     //    moveVal = 1;
-                    rotateVal = -23;
+                    rotateVal = -180;
                 }
                 else if(pos>800){
-                    rotateVal = 23;
+                    rotateVal = 180;
                 }
                 else
-                    rotateVal = 0;
+                    rotateVal = 180;
                 if (width>600) {
                     moveVal = -2;
                 }
@@ -866,6 +866,7 @@ public class AutoControlDroneActivity
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
+
                         droneControlService.moveUp((float)0.6);
 
                         thread.start();
@@ -1042,13 +1043,21 @@ public class AutoControlDroneActivity
                 if (faceGet)
                 {
                     Log.i("ttt","I will rotate "+rotateVal);
+                    //droneControlService.doLeftFlip();
+                    try {
+                        Thread.sleep(5000);  //等待稳定
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    droneControlService.stop();
+                    //break;
                     Rotate(rotateVal);
                     try {
                         Thread.sleep(1000);  //等待稳定
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    Move(moveVal);
+                    //Move(moveVal);
                     GetandSaveCurrentImage();
 
                     try {
