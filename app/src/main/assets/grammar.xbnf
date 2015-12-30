@@ -1,18 +1,18 @@
 $takeoff=(起飞|飞起来[吧])/k="action",v="takeoff"/;
 $landing=(降落)/k="action",v="landing"/;
 $emergency=(紧急|危险|迫降)/k="action",v="emergency"/;
-$takephoto=(拍照|茄子)/k="action",v="takephoto"/;
+$takephoto=(拍照|茄子|张士文笑一个)/k="action",v="takephoto"/;
 $record=(录像|录段视频[吧]|结束录像)/k="action",v="record"/;
-$moveforward=(往前飞)/k="action",v="moveforward"/;
-$movebackward=(往后飞)/k="action",v="movebackward"/;
-$moveup=(飞高点)/k="action",v="moveup"/;
-$movedown=(飞低点)/k="action",v="movedown"/;
+$moveforward=(往前飞|前进)/k="action",v="moveforward"/;
+$movebackward=(往后飞|后退)/k="action",v="movebackward"/;
+$moveup=(飞高点|升高|上升)/k="action",v="moveup"/;
+$movedown=(飞低点|降低|下降)/k="action",v="movedown"/;
 $moveleft=(往左飞|左飞)/k="action",v="moveleft"/;
 $moveright=(往右飞|右飞)/k="action",v="moveright"/;
 $turnleft=(左转)/k="action",v="turnleft"/;
 $turnright=(右转)/k="action",v="turnright"/;
 $switchcamera=(转换相机)/k="action",v="switchcamera"/;
-$stop=(停止)/k="action",v="stop"/;
+$stop=(停[止])/k="action",v="stop"/;
 $CMD_MESSAGE=($takeoff |$landing |$emergency |$takephoto |$record |$moveforward |$movebackward |$moveup |$movedown |$moveleft |$moveright |$turnleft |$turnright |$switchcamera |$stop );
 ( \<s\> ( $CMD_MESSAGE ) \<\/s\> )
 
